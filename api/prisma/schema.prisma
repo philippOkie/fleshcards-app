@@ -4,6 +4,9 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// npx prisma migrate dev --name init
+// npx prisma generate
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +14,34 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  login        String   @unique
+  passwordHash String
+  name         String   @unique
+  decks        Deck[]
+}
+
+model Deck {
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards  Card[]
+}
+
+model Card {
+  id              Int     @id @default(autoincrement())
+  textForward     String?
+  textBack        String?
+  imageUrlForward String?
+  imageUrlBack    String?
+  easeFactor      Float   @default(2.5)
+  interval        Int     @default(1)
+  repetitions     Int     @default(0)
+  reviewDate      DateTime
+  deckId         Int
+  deck           Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
 }
