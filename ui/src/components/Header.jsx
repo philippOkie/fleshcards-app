@@ -17,7 +17,7 @@ function Header() {
             className="menu bg-neutral menu-sm dropdown-content bg-base-500 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a>Settings</a>
+              <a>Change Avatar</a>
             </li>
             <li>
               <a>Logout</a>
