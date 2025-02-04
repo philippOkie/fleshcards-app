@@ -4,7 +4,7 @@ function Sidebar() {
       <div className="form-control pr-4">
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Search by name or topic"
           className="input input-bordered w-24 md:w-auto"
         />
       </div>
