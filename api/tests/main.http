@@ -1,2 +1,2 @@
-### Get all users
+### Hello world
 GET http://localhost:3000/
