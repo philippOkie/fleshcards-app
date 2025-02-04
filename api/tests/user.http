@@ -1,0 +1,17 @@
+### Register User - Success 
+POST http://localhost:3000/api/user/register
+Content-Type: application/json
+
+{
+  "login": "testuser",
+  "password": "securepass",
+  "name": "Test User"
+}
+
+### Register User - Missing Fields
+POST http://localhost:3000/api/user/register
+Content-Type: application/json
+
+{
+  "login": "user2"
+}
