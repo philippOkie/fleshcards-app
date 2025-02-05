@@ -15,7 +15,10 @@ router.post("/create", async (req, res) => {
       },
     });
 
-    res.json({ message: "Deck created successfully", deck });
+    res.json({
+      message: "Deck created successfully",
+      deckId: deck.id,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
