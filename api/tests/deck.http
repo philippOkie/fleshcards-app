@@ -1,0 +1,11 @@
+### Get all decks
+GET http://localhost:3000/api/decks/all
+
+### Create a New Deck (Use userId from your local database)
+POST http://localhost:3000/api/decks/create
+Content-Type: application/json
+
+{
+  "userId": "b71c5377-7373-491f-9c2d-9a13dfb7b84f",
+  "name": "French Vocabulary"
+}
