@@ -16,9 +16,9 @@ function App() {
   return (
     <div className="h-screen flex flex-col">
       <Header />
-      <div className="flex flex justify-center gap-10">
+      <div className="flex flex pl-12 gap-18">
         <Sidebar />
-        <div className="flex flex-col items-center ">
+        <div className="flex flex-col pr-32">
           <Card
             showAnswerBtnClicked={showAnswerBtnClicked}
             props={{
