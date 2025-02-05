@@ -1,14 +1,15 @@
 import "dotenv/config";
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 
 import userRouter from "./routes/user.js";
+import deckRouter from "./routes/deck.js";
 
 const app = express();
 
 app.use(express.json());
 
 app.use("/api/user", userRouter);
+app.use("/api/decks", deckRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
