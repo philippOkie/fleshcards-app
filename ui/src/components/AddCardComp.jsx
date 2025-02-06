@@ -18,8 +18,20 @@ function AddCardComp() {
     autoResize(textareaRef2, value2);
   }, [value1, value2]);
 
+  const handleDeleteCard = () => {
+    setValue1("");
+    setValue2("");
+  };
+
   return (
-    <div className="rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
+    <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
+      <button
+        onClick={handleDeleteCard}
+        className="absolute top-2 left-4 text-red-500 bg-transparent border-none text-xl cursor-none"
+      >
+        &times;
+      </button>
+
       <div className="flex flex-row items-center gap-8 flex-1">
         <textarea
           placeholder="Type your text here!"
