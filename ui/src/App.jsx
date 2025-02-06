@@ -8,6 +8,11 @@ import { useState } from "react";
 
 function App() {
   const [showAnswerBtnClicked, setShowAnswerBtnClicked] = useState(false);
+  const [createDeckBtnClick, setCreateDeckBtnClick] = useState(false);
+
+  const handleCreateDeckBtnClick = () => {
+    setCreateDeckBtnClick(!createDeckBtnClick);
+  };
 
   const handleShowAnswerBtnClick = () => {
     setShowAnswerBtnClicked(!showAnswerBtnClicked);
@@ -15,26 +20,35 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header />
-      <div className="flex flex pl-12 gap-18">
-        <Sidebar />
-        <div className="flex flex-col pr-32">
-          <Card
-            showAnswerBtnClicked={showAnswerBtnClicked}
-            props={{
-              forwardText: "Hello",
-              backText: "Привет",
-            }}
-          />
-          <div className="flex justify-center mt-10">
-            {showAnswerBtnClicked ? (
-              <CardRateBtns />
-            ) : (
-              <ShowAnswerBtn onShowAnswerBtnClick={handleShowAnswerBtnClick} />
-            )}
+      <Header
+        createDeckBtnClicked={handleCreateDeckBtnClick}
+        createDeckBtnClick={createDeckBtnClick}
+      />
+      {createDeckBtnClick ? (
+        <div>hi</div>
+      ) : (
+        <div className="flex flex pl-12 gap-18">
+          <Sidebar />
+          <div className="flex flex-col pr-32">
+            <Card
+              showAnswerBtnClicked={showAnswerBtnClicked}
+              props={{
+                forwardText: "Hello",
+                backText: "Привет",
+              }}
+            />
+            <div className="flex justify-center mt-10">
+              {showAnswerBtnClicked ? (
+                <CardRateBtns />
+              ) : (
+                <ShowAnswerBtn
+                  onShowAnswerBtnClick={handleShowAnswerBtnClick}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
