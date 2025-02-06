@@ -19,13 +19,11 @@ function Header() {
       <div className="navbar-start flex gap-2 items-center pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
         <a className="btn btn-neutral w-32 !text-xl">Decks</a>
-        {/* Use the URL state to decide what to render */}
         <a
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
           onClick={handlePlusClick}
         >
           {inCreateDeck ? (
-            // If on /create-deck, you can display an alternative icon (or simply a different appearance)
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
               <g
                 fill="none"
