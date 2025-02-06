@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import ShowAnswerBtn from "./components/ShowAnswerBtn";
 import Sidebar from "./components/Sidebar";
 import CardRateBtns from "./components/CardRateBtns";
+import AddCardComp from "./components/AddCardComp";
 
 import { useState } from "react";
 
@@ -25,7 +26,9 @@ function App() {
         createDeckBtnClick={createDeckBtnClick}
       />
       {createDeckBtnClick ? (
-        <div>hi</div>
+        <div className="flex flex pl-12 gap-18">
+          <AddCardComp />
+        </div>
       ) : (
         <div className="flex flex pl-12 gap-18">
           <Sidebar />
