@@ -26,8 +26,10 @@ function App() {
         createDeckBtnClick={createDeckBtnClick}
       />
       {createDeckBtnClick ? (
-        <div className="flex flex pl-12 gap-18">
+        <div className="flex flex-col pl-48 pr-48 pb-12 gap-4 h-screen overflow-y-auto">
           <AddCardComp />
+
+          <button className="btn btn-primary btn-block">ADD CARD</button>
         </div>
       ) : (
         <div className="flex flex pl-12 gap-18">
