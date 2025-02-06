@@ -25,10 +25,7 @@ function AddCardComp() {
 
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
-      <button
-        onClick={handleDeleteCard}
-        className="absolute top-2 left-4 text-red-500 bg-transparent border-none text-xl cursor-none"
-      >
+      <button onClick={handleDeleteCard} className="absolute top-2 left-4 ">
         &times;
       </button>
 

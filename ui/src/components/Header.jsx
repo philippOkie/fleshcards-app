@@ -1,12 +1,27 @@
+import { useNavigate } from "react-router-dom";
+
 function Header({ createDeckBtnClicked, createDeckBtnClick }) {
+  const navigate = useNavigate();
+
+  const handlePlusClick = () => {
+    createDeckBtnClicked();
+
+    if (!createDeckBtnClick) {
+      navigate("/create-deck");
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <div className="navbar bg-base-100 mb-10 mt-2">
       <div className="navbar-start flex gap-2 items-center pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
         <a className="btn btn-neutral w-32 !text-xl">Decks</a>
+        {/* Replace the direct onClick with handlePlusClick */}
         <a
-          className="btn btn-accent w-16 !text-2xl"
-          onClick={createDeckBtnClicked}
+          className="btn btn-accent w-16 !text-2xl cursor-pointer"
+          onClick={handlePlusClick}
         >
           {createDeckBtnClick ? (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
@@ -19,7 +34,6 @@ function Header({ createDeckBtnClicked, createDeckBtnClick }) {
                 transform="translate(2 3)"
               >
                 <path d="m5.5.5h6c1.1045695 0 2 .8954305 2 2v10c0 1.1045695-.8954305 2-2 2h-6c-1.1045695 0-2-.8954305-2-2v-10c0-1.1045695.8954305-2 2-2zm8 2.5h1c1.1045695 0 2 .8954305 2 2v5c0 1.1045695-.8954305 2-2 2h-1z" />
-
                 <path
                   d="m.5 3h1c1.1045695 0 2 .8954305 2 2v5c0 1.1045695-.8954305 2-2 2h-1z"
                   transform="matrix(-1 0 0 1 4 0)"
@@ -33,9 +47,9 @@ function Header({ createDeckBtnClicked, createDeckBtnClick }) {
       </div>
 
       <div className="navbar-end pr-10">
-        <div className="dropdown dropdown-end ">
-          <div tabIndex={0} role="button" className="btn btn-circle avatar ">
-            <div className=" w-24 rounded-full"></div>
+        <div className="dropdown dropdown-end">
+          <div tabIndex={0} role="button" className="btn btn-circle avatar">
+            <div className="w-24 rounded-full"></div>
           </div>
           <ul
             tabIndex={0}
