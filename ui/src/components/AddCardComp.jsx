@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 
 function AddCardComp() {
-  const [value1, setValue1] = useState("");
-  const [value2, setValue2] = useState("");
-  const textareaRef1 = useRef(null);
-  const textareaRef2 = useRef(null);
+  const [frontText, setFrontText] = useState("");
+  const [backText, setBackText] = useState("");
+  const frontTextareaRef = useRef(null);
+  const backTextareaRef = useRef(null);
 
-  const autoResize = (textareaRef, value) => {
+  const autoResizeTextarea = (textareaRef, text) => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -14,13 +14,13 @@ function AddCardComp() {
   };
 
   useEffect(() => {
-    autoResize(textareaRef1, value1);
-    autoResize(textareaRef2, value2);
-  }, [value1, value2]);
+    autoResizeTextarea(frontTextareaRef, frontText);
+    autoResizeTextarea(backTextareaRef, backText);
+  }, [frontText, backText]);
 
   const handleDeleteCard = () => {
-    setValue1("");
-    setValue2("");
+    setFrontText("");
+    setBackText("");
   };
 
   return (
@@ -31,11 +31,11 @@ function AddCardComp() {
 
       <div className="flex flex-row items-center gap-8 flex-1">
         <textarea
-          placeholder="Type your text here!"
+          placeholder="Type your text here! (Front side)"
           className="textarea w-full resize-none p-2"
-          ref={textareaRef1}
-          value={value1}
-          onChange={(e) => setValue1(e.target.value)}
+          ref={frontTextareaRef}
+          value={frontText}
+          onChange={(e) => setFrontText(e.target.value)}
           style={{ minHeight: "40px" }}
         />
         <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg bg-base-100">
@@ -47,11 +47,11 @@ function AddCardComp() {
 
       <div className="flex flex-row items-center gap-8 flex-1">
         <textarea
-          placeholder="Type your text here!"
+          placeholder="Type your text here! (Back side)"
           className="textarea w-full resize-none p-2"
-          ref={textareaRef2}
-          value={value2}
-          onChange={(e) => setValue2(e.target.value)}
+          ref={backTextareaRef}
+          value={backText}
+          onChange={(e) => setBackText(e.target.value)}
           style={{ minHeight: "40px" }}
         />
         <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg bg-base-100">
