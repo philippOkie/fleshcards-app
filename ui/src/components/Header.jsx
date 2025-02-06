@@ -1,15 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-function Header({ createDeckBtnClicked, createDeckBtnClick }) {
+function Header() {
+  const location = useLocation();
   const navigate = useNavigate();
 
-  const handlePlusClick = () => {
-    createDeckBtnClicked();
+  const inCreateDeck = location.pathname === "/create-deck";
 
-    if (!createDeckBtnClick) {
-      navigate("/create-deck");
-    } else {
+  const handlePlusClick = () => {
+    if (inCreateDeck) {
       navigate("/");
+    } else {
+      navigate("/create-deck");
     }
   };
 
@@ -18,12 +19,13 @@ function Header({ createDeckBtnClicked, createDeckBtnClick }) {
       <div className="navbar-start flex gap-2 items-center pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
         <a className="btn btn-neutral w-32 !text-xl">Decks</a>
-        {/* Replace the direct onClick with handlePlusClick */}
+        {/* Use the URL state to decide what to render */}
         <a
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
           onClick={handlePlusClick}
         >
-          {createDeckBtnClick ? (
+          {inCreateDeck ? (
+            // If on /create-deck, you can display an alternative icon (or simply a different appearance)
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
               <g
                 fill="none"
@@ -33,9 +35,9 @@ function Header({ createDeckBtnClicked, createDeckBtnClick }) {
                 strokeLinejoin="round"
                 transform="translate(2 3)"
               >
-                <path d="m5.5.5h6c1.1045695 0 2 .8954305 2 2v10c0 1.1045695-.8954305 2-2 2h-6c-1.1045695 0-2-.8954305-2-2v-10c0-1.1045695.8954305-2 2-2zm8 2.5h1c1.1045695 0 2 .8954305 2 2v5c0 1.1045695-.8954305 2-2 2h-1z" />
+                <path d="m5.5.5h6c1.10457 0 2 .89543 2 2v10c0 1.10457-.89543 2-2 2h-6c-1.10457 0-2-.89543-2-2v-10c0-1.10457.89543-2 2-2zm8 2.5h1c1.10457 0 2 .89543 2 2v5c0 1.10457-.89543 2-2 2h-1z" />
                 <path
-                  d="m.5 3h1c1.1045695 0 2 .8954305 2 2v5c0 1.1045695-.8954305 2-2 2h-1z"
+                  d="m.5 3h1c1.10457 0 2 .89543 2 2v5c0 1.10457-.89543 2-2 2h-1z"
                   transform="matrix(-1 0 0 1 4 0)"
                 />
               </g>

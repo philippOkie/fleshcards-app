@@ -6,12 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
 function App() {
-  const [createDeckBtnClick, setCreateDeckBtnClick] = useState(false);
   const [showAnswerBtnClicked, setShowAnswerBtnClicked] = useState(false);
-
-  const handleCreateDeckBtnClick = () => {
-    setCreateDeckBtnClick((prev) => !prev);
-  };
 
   const handleShowAnswerBtnClick = () => {
     setShowAnswerBtnClicked((prev) => !prev);
@@ -20,11 +15,7 @@ function App() {
   return (
     <Router>
       <div className="h-screen flex flex-col">
-        <Header
-          createDeckBtnClicked={handleCreateDeckBtnClick}
-          createDeckBtnClick={createDeckBtnClick}
-        />
-
+        <Header />
         <Routes>
           <Route
             path="/"
@@ -35,7 +26,6 @@ function App() {
               />
             }
           />
-
           <Route path="/create-deck" element={<CreateDeck />} />
         </Routes>
       </div>
