@@ -4,26 +4,22 @@ function AddCardComp() {
       <div className="flex flex-row items-center gap-8">
         <input
           type="text"
-          placeholder="Type here!"
+          placeholder="Type your text here!"
           className="input w-full max-w-xs w-lg"
         />
-        <div className="cursor-pointer select-none">
-          <div className="w-16 h-16 flex items-center justify-center text-3xl font-bold rounded-xl bg-base-100">
-            +
-          </div>
+        <div className="btn btn-square flex items-center justify-center text-3xl font-bold bg-base-100">
+          img
         </div>
       </div>
       <div className="divider divider-horizontal"></div>
       <div className="flex flex-row items-center gap-8">
         <input
           type="text"
-          placeholder="Type here!"
+          placeholder="Type your text here!"
           className="input w-full max-w-xs w-lg"
         />
-        <div className="cursor-pointer select-none">
-          <div className="w-16 h-16 flex items-center justify-center text-3xl font-bold rounded-xl bg-base-100">
-            +
-          </div>
+        <div className="btn btn-square flex items-center justify-center text-3xl font-bold bg-base-100">
+          img
         </div>
       </div>
     </div>
