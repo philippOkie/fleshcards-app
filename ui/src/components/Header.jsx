@@ -1,36 +1,14 @@
-import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDeck } from "./DeckContext"; // Import the useDeck hook
 
 import Avatar from "./Avatar";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [unfinishedDeck, setUnfinishedDeck] = useState(null);
+  const { unfinishedDeck } = useDeck(); // Use the context to get unfinishedDeck
 
-  const userId = "a4ec2f47-dfaa-44cc-8124-2ce595a7d562";
   const isDeckPage = location.pathname.startsWith("/deck/");
-
-  useEffect(() => {
-    const fetchUnfinishedDeck = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setUnfinishedDeck(data.id ? data : null);
-        } else {
-          console.error(`Error: ${response.status} - ${await response.text()}`);
-        }
-      } catch (error) {
-        console.error("Error fetching unfinished deck:", error);
-      }
-    };
-
-    fetchUnfinishedDeck();
-  }, [userId]);
 
   const handlePlusClick = () => {
     if (isDeckPage) {
