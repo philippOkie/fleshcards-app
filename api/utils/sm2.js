@@ -1,11 +1,11 @@
-export function sm2Algorithm(card, rating) {
+function sm2Algorithm(card, rating) {
   let { easiness, interval, repetitions } = card;
 
   // Map 4-button rating to SM-2 quality scale
   const qualityMap = { 1: 0, 2: 2, 3: 3, 4: 5 };
   let quality = qualityMap[rating] ?? 3; // Default to 3 if something goes wrong
 
-  // If recall is poor, reset repetitions and interval
+  // If recall is poor (quality < 3), reset repetitions and interval
   if (quality < 3) {
     repetitions = 0;
     interval = 1; // Immediate review
@@ -26,10 +26,13 @@ export function sm2Algorithm(card, rating) {
   // Ensure EF is at least 1.3
   if (easiness < 1.3) easiness = 1.3;
 
+  // Calculate the next review date based on the interval
+  const reviewDate = new Date(Date.now() + interval * 24 * 60 * 60 * 1000);
+
   return {
     easiness,
     interval,
     repetitions,
-    reviewDate: new Date(Date.now() + interval * 24 * 60 * 60 * 1000),
+    reviewDate,
   };
 }
