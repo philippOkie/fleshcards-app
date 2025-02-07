@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDeck } from "./DeckContext"; // Import the useDeck hook
+import { useDeck } from "./DeckContext";
 
 import Avatar from "./Avatar";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { unfinishedDeck } = useDeck(); // Use the context to get unfinishedDeck
+
+  const { unfinishedDeck } = useDeck();
 
   const isDeckPage = location.pathname.startsWith("/deck/");
 
