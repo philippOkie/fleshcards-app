@@ -1,9 +1,8 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import CreateDeck from "./components/CreateDeck";
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
 
 function App() {
   const [showAnswerBtnClicked, setShowAnswerBtnClicked] = useState(false);
@@ -26,7 +25,7 @@ function App() {
               />
             }
           />
-          <Route path="/create-deck" element={<CreateDeck />} />
+          <Route path="/deck/:id" element={<CreateDeck />} />
         </Routes>
       </div>
     </Router>

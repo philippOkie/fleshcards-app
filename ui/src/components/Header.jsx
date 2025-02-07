@@ -5,11 +5,9 @@ function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const [unfinishedDeck, setUnfinishedDeck] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   const userId = "b71c5377-7373-491f-9c2d-9a13dfb7b84f";
-
-  const inCreateDeck = location.pathname === "/create-deck";
+  const isDeckPage = location.pathname.startsWith("/deck/");
 
   useEffect(() => {
     const fetchUnfinishedDeck = async () => {
@@ -18,36 +16,26 @@ function Header() {
           `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`
         );
 
-        if (!response.ok) {
-          const responseText = await response.text();
-          console.error(`Error: ${response.status} - ${responseText}`);
-          return;
-        }
-
-        const data = await response.json();
-
-        if (data && data.id) {
-          setUnfinishedDeck(data);
+        if (response.ok) {
+          const data = await response.json();
+          setUnfinishedDeck(data.id ? data : null);
+        } else {
+          console.error(`Error: ${response.status} - ${await response.text()}`);
         }
       } catch (error) {
         console.error("Error fetching unfinished deck:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchUnfinishedDeck();
-  }, []);
+  }, [userId]);
 
   const handlePlusClick = () => {
-    if (inCreateDeck) {
+    if (isDeckPage) {
       navigate("/");
     } else {
-      if (unfinishedDeck) {
-        navigate(`deck/${unfinishedDeck.id}`);
-      } else {
-        navigate("/create-deck");
-      }
+      const deckId = unfinishedDeck?.id;
+      navigate(deckId ? `/deck/${deckId}` : "/");
     }
   };
 
@@ -55,14 +43,12 @@ function Header() {
     <div className="navbar bg-base-100 mb-10 mt-2">
       <div className="navbar-start flex gap-2 items-center pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
-        <a className="btn btn-neutral w-32 !text-xl">Decks</a>
-        <a
+        <button className="btn btn-neutral w-32 !text-xl">Decks</button>
+        <button
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
           onClick={handlePlusClick}
         >
-          {loading ? (
-            <span className="loading loading-spinner"></span>
-          ) : inCreateDeck ? (
+          {isDeckPage ? (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
               <g
                 fill="none"
@@ -82,14 +68,14 @@ function Header() {
           ) : (
             "+"
           )}
-        </a>
+        </button>
       </div>
 
       <div className="navbar-end pr-10">
         <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-circle avatar">
+          <button tabIndex={0} className="btn btn-circle avatar">
             <div className="w-24 rounded-full"></div>
-          </div>
+          </button>
           <ul
             tabIndex={0}
             className="menu bg-neutral menu-sm dropdown-content bg-base-500 rounded-box z-[1] mt-3 w-52 p-2 shadow"
