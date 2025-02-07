@@ -22,6 +22,7 @@ model User {
   passwordHash String
   name         String   @unique
   email        String   @unique
+  avatarUrl    String?  
   decks        Deck[]
 }
 
@@ -32,6 +33,7 @@ model Deck {
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   cards    Card[]
   finished Boolean @default(false)
+  topics   String[] 
 }
 
 model Card {
