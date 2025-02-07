@@ -41,4 +41,51 @@ router.post("/create", async (req, res) => {
   }
 });
 
+router.delete("/delete", async (req, res) => {
+  try {
+    const { userId, deckId, cardId } = req.body;
+
+    // Verify if the deck belongs to the user
+    const deck = await prisma.deck.findFirst({
+      where: {
+        id: parseInt(deckId),
+        userId: userId,
+      },
+    });
+
+    if (!deck) {
+      return res
+        .status(404)
+        .json({ error: "Deck not found or does not belong to the user." });
+    }
+
+    // Verify if the card exists in the deck
+    const card = await prisma.card.findFirst({
+      where: {
+        id: parseInt(cardId),
+        deckId: parseInt(deckId),
+      },
+    });
+
+    if (!card) {
+      return res
+        .status(404)
+        .json({ error: "Card not found in the specified deck." });
+    }
+
+    // Delete the card
+    await prisma.card.delete({
+      where: {
+        id: parseInt(cardId),
+      },
+    });
+
+    res.json({
+      message: "Card deleted successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;
