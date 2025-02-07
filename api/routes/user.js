@@ -6,17 +6,28 @@ import bcrypt from "bcryptjs";
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 router.post("/register", async (req, res) => {
   try {
-    const { login, password, name } = req.body;
+    const { login, password, name, email } = req.body;
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { login },
+    // Validate email format
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    // Check if user already exists by login or email
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ login }, { email }],
+      },
     });
 
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res
+        .status(400)
+        .json({ error: "User with this login or email already exists" });
     }
 
     // Hash password
@@ -29,6 +40,7 @@ router.post("/register", async (req, res) => {
         login,
         passwordHash: hashedPassword,
         name,
+        email,
       },
     });
 

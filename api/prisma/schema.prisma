@@ -21,6 +21,7 @@ model User {
   login        String   @unique
   passwordHash String
   name         String   @unique
+  email        String   @unique
   decks        Deck[]
 }
 

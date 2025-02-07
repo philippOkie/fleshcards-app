@@ -6,13 +6,13 @@ POST http://localhost:3000/api/decks/create
 Content-Type: application/json
 
 {
-  "userId": "b71c5377-7373-491f-9c2d-9a13dfb7b84f",
+  "userId": "a4ec2f47-dfaa-44cc-8124-2ce595a7d562",
   "name": "Hola Vocabulary"
 }
 
 ### Get unfinished deck for a specific user
-GET http://localhost:3000/api/decks/get-unfinished-deck?userId=b71c5377-7373-491f-9c2d-9a13dfb7b84f
+GET http://localhost:3000/api/decks/get-unfinished-deck?userId=a4ec2f47-dfaa-44cc-8124-2ce595a7d562
 Content-Type: application/json
 
 ### Get individual deck by id
-GET http://localhost:3000/api/decks/deck/1?userId=b71c5377-7373-491f-9c2d-9a13dfb7b84f
+GET http://localhost:3000/api/decks/deck/1?userId=a4ec2f47-dfaa-44cc-8124-2ce595a7d562
