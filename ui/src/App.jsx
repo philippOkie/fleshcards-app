@@ -17,7 +17,7 @@ function App() {
   return (
     <Router>
       <DeckProvider>
-        <div className="h-screen flex flex-col">
+        <div className=" flex flex-col">
           <Header />
           <Routes>
             <Route
