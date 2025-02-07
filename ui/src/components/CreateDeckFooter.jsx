@@ -10,8 +10,8 @@ function CreateDeckFooter() {
 
         <input
           type="text"
-          style={{ width: "500px" }}
-          placeholder='You can add topics here "@anatomy @english" etc.'
+          style={{ width: "600px" }}
+          placeholder='You can add topics here "@anatomy @english_spanish"'
           className="input w-full max-w-lg"
         />
       </div>
