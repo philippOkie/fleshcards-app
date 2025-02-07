@@ -1,11 +1,18 @@
-function CreateDeckFooter() {
+function CreateDeckFooter({
+  deckName,
+  setDeckName,
+  deckTopics,
+  setDeckTopics,
+}) {
   return (
-    <footer className="flex flex-row justify-between bg-base-100  text-center p-6 pl-12 pr-12 w-full">
+    <footer className="flex flex-row justify-between bg-base-100 text-center p-6 pl-12 pr-12 w-full">
       <div className="flex flex-row gap-8">
         <input
           type="text"
           placeholder="Type your deck name here!"
           className="input w-full max-w-xs"
+          value={deckName}
+          onChange={(e) => setDeckName(e.target.value)}
         />
 
         <input
@@ -13,6 +20,8 @@ function CreateDeckFooter() {
           style={{ width: "600px" }}
           placeholder='You can add topics here "@anatomy @english_spanish"'
           className="input w-full max-w-lg"
+          value={deckTopics}
+          onChange={(e) => setDeckTopics(e.target.value)}
         />
       </div>
 
