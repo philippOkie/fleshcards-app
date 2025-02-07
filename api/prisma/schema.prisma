@@ -25,11 +25,12 @@ model User {
 }
 
 model Deck {
-  id     Int    @id @default(autoincrement())
-  name   String
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cards  Card[]
+  id       Int    @id @default(autoincrement())
+  name     String
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cards    Card[]
+  finished Boolean @default(false)
 }
 
 model Card {
