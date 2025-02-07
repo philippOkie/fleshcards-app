@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 
-function AddCardComp() {
-  const [frontText, setFrontText] = useState("");
-  const [backText, setBackText] = useState("");
+function AddCardComp({ initialFrontText, initialBackText }) {
+  const [frontText, setFrontText] = useState(initialFrontText || "");
+  const [backText, setBackText] = useState(initialBackText || "");
   const frontTextareaRef = useRef(null);
   const backTextareaRef = useRef(null);
 
@@ -25,7 +25,7 @@ function AddCardComp() {
 
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
-      <button onClick={handleDeleteCard} className="absolute top-2 left-4 ">
+      <button onClick={handleDeleteCard} className="absolute top-2 left-4">
         &times;
       </button>
 
