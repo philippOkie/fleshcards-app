@@ -1,16 +1,53 @@
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [unfinishedDeck, setUnfinishedDeck] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const userId = "b71c5377-7373-491f-9c2d-9a13dfb7b84f";
 
   const inCreateDeck = location.pathname === "/create-deck";
+
+  useEffect(() => {
+    const fetchUnfinishedDeck = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`
+        );
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          console.error(`Error: ${response.status} - ${responseText}`);
+          return;
+        }
+
+        const data = await response.json();
+
+        if (data && data.id) {
+          setUnfinishedDeck(data);
+        }
+      } catch (error) {
+        console.error("Error fetching unfinished deck:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUnfinishedDeck();
+  }, []);
 
   const handlePlusClick = () => {
     if (inCreateDeck) {
       navigate("/");
     } else {
-      navigate("/create-deck");
+      if (unfinishedDeck) {
+        navigate(`deck/${unfinishedDeck.id}`);
+      } else {
+        navigate("/create-deck");
+      }
     }
   };
 
@@ -23,7 +60,9 @@ function Header() {
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
           onClick={handlePlusClick}
         >
-          {inCreateDeck ? (
+          {loading ? (
+            <span className="loading loading-spinner"></span>
+          ) : inCreateDeck ? (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
               <g
                 fill="none"
