@@ -1,6 +1,6 @@
 function CreateDeckFooter() {
   return (
-    <footer className="flex flex-row justify-between bg-base-100 fixed text-center p-4  bottom-0 left-0 pl-12 pr-12 w-full">
+    <footer className="flex flex-row justify-between bg-base-100  text-center p-6 pl-12 pr-12 w-full">
       <div className="flex flex-row gap-8">
         <input
           type="text"
@@ -16,7 +16,9 @@ function CreateDeckFooter() {
         />
       </div>
 
-      <button className="btn btn-lg btn-success">Save</button>
+      <button className="btn btn-lg fixed btn-success bottom-6 right-12">
+        Save
+      </button>
     </footer>
   );
 }
