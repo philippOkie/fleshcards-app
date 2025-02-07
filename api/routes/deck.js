@@ -47,6 +47,36 @@ router.get("/get-unfinished-deck", async (req, res) => {
   res.json(unfinishedDeck);
 });
 
+router.get("/deck/:id", async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.query;
+
+  try {
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+
+    const deck = await prisma.deck.findUnique({
+      where: { id: parseInt(id) },
+      include: { cards: true },
+    });
+
+    if (!deck) {
+      return res.status(404).json({ message: "Deck not found" });
+    }
+
+    if (deck.userId !== userId) {
+      return res
+        .status(403)
+        .json({ message: "You do not have permission to view this deck" });
+    }
+
+    res.json(deck);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get("/all", async (req, res) => {
   const decks = await prisma.deck.findMany({
     include: { cards: true },

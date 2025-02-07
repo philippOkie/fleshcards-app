@@ -14,4 +14,5 @@ Content-Type: application/json
 GET http://localhost:3000/api/decks/get-unfinished-deck?userId=b71c5377-7373-491f-9c2d-9a13dfb7b84f
 Content-Type: application/json
 
-
+### Get individual deck by id
+GET http://localhost:3000/api/decks/deck/1?userId=b71c5377-7373-491f-9c2d-9a13dfb7b84f
