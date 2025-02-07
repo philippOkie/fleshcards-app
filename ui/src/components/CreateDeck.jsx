@@ -11,7 +11,7 @@ function CreateDeck() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mt-24">
       <div className="flex flex-col pl-48 pr-48 pb-12 gap-4 overflow-y-auto flex-1">
         {unfinishedDeck.cards.map((card, index) => (
           <AddCardComp

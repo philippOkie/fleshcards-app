@@ -5,7 +5,7 @@ import ShowAnswerBtn from "./ShowAnswerBtn";
 
 function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
   return (
-    <div className="flex flex pl-12 gap-18">
+    <div className="flex flex pl-12 gap-18 mt-24">
       <Sidebar />
       <div className="flex flex-col pr-32">
         <Card
