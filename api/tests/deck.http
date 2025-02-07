@@ -7,5 +7,11 @@ Content-Type: application/json
 
 {
   "userId": "b71c5377-7373-491f-9c2d-9a13dfb7b84f",
-  "name": "French Vocabulary"
+  "name": "Hola Vocabulary"
 }
+
+### Get unfinished deck for a specific user
+GET http://localhost:3000/api/decks/get-unfinished-deck?userId=b71c5377-7373-491f-9c2d-9a13dfb7b84f
+Content-Type: application/json
+
+
