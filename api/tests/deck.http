@@ -1,6 +1,6 @@
 ### Get all decks
 GET http://localhost:3000/api/decks/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6eyJpZCI6ImE0ZWMyZjQ3LWRmYWEtNDRjYy04MTI0LTJjZTU5NWE3ZDU2MiIsImxvZ2luIjoidGVzdHVzZXIiLCJwYXNzd29yZEhhc2giOiIkMmEkMTAkdE41ZXUzODNKMXpLY0NLam5QYS52T2taSU8vTWc2NmJMLy5ZTDY3bFRyYjdLaFdTaUMxcTIiLCJuYW1lIjoiVGVzdCBVc2VyIiwiZW1haWwiOiJ0ZXN0dXNlckBtYWlsLmNvbSIsImF2YXRhclVybCI6bnVsbH0sImlhdCI6MTczOTA0MTEzMywiZXhwIjoxNzM5NjQ1OTMzfQ.VJDhHy0kXBXaM4sL70dKV8bVj--TgetJkX4pLEnR4gc
+Authorization: Bearer 'TOKEN'
 
 ### Create a New Deck (Use userId from your local database)
 POST http://localhost:3000/api/decks/create

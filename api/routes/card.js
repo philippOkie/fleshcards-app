@@ -4,7 +4,9 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/create", async (req, res) => {
+import { verifyToken } from "../utils/auth.js";
+
+router.post("/create", verifyToken, async (req, res) => {
   try {
     const { userId, deckId, textForward, textBack } = req.body;
 
@@ -41,7 +43,7 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.delete("/delete", async (req, res) => {
+router.delete("/delete", verifyToken, async (req, res) => {
   try {
     const { userId, deckId, cardId } = req.body;
 
