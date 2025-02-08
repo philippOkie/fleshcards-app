@@ -6,11 +6,17 @@ function Sidebar() {
   useEffect(() => {
     const fetchUnfinishedDeck = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/decks/all`);
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(`http://localhost:3000/api/decks/all`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
-
           setDecks(data);
         } else {
           console.error(`Error: ${response.status} - ${await response.text()}`);

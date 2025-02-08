@@ -14,8 +14,21 @@ export const DeckProvider = ({ children }) => {
   useEffect(() => {
     const fetchUnfinishedDeck = async () => {
       try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          console.error("Error: No token found");
+          return;
+        }
+
         const response = await fetch(
-          `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`
+          `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (response.ok) {
