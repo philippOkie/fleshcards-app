@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
         login,
         passwordHash: hashedPassword,
         name,
-        email,
+        email: email.toLowerCase(),
       },
     });
 
@@ -56,12 +56,17 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.post("/login", async (req, res) => {
   try {
-    const { login, password } = req.body;
+    const { loginOrEmail, login, password } = req.body;
 
-    // Find user by login
-    const user = await prisma.user.findUnique({ where: { login } });
+    // Find user by login OR email
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ login: login }, { email: loginOrEmail }],
+      },
+    });
 
     if (!user) {
       return res.status(401).json({ error: "Invalid login or password" });
@@ -74,7 +79,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Generate JWT Token
-    const token = generateToken(user); // Pass full user object
+    const token = generateToken(user);
 
     res.json({
       message: "Login successful",
