@@ -79,7 +79,7 @@ router.get("/deck/:id", async (req, res) => {
 
 // TODO: We will need to update it so it returns all decks which are related to the authenticated user
 router.get("/all", async (req, res) => {
-  const decks = await prisma.deck.findMany({});
+  const decks = await prisma.deck.findMany({ where: { finished: true } });
   res.json(decks);
 });
 
