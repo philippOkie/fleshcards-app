@@ -1,5 +1,5 @@
 function LoginPage() {
-  return <div>LoginPage</div>;
+  return <div className="card bg-neutral text-neutral-content w-290 p-4"></div>;
 }
 
 export default LoginPage;
