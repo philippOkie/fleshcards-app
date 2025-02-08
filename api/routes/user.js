@@ -8,6 +8,10 @@ const prisma = new PrismaClient();
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+import { generateToken } from "../utils/auth.js";
+
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
+
 router.post("/register", async (req, res) => {
   try {
     const { login, password, name, email } = req.body;
@@ -47,6 +51,36 @@ router.post("/register", async (req, res) => {
     res
       .status(201)
       .json({ message: "User created successfully", userId: user.id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+router.post("/login", async (req, res) => {
+  try {
+    const { login, password } = req.body;
+
+    // Find user by login
+    const user = await prisma.user.findUnique({ where: { login } });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid login or password" });
+    }
+
+    // Verify password
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: "Invalid login or password" });
+    }
+
+    // Generate JWT Token
+    const token = generateToken(user); // Pass full user object
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, login: user.login, email: user.email },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
