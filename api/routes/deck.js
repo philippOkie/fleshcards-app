@@ -4,7 +4,9 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.post("/create", async (req, res) => {
+import { verifyToken } from "../utils/auth.js";
+
+router.post("/create", verifyToken, async (req, res) => {
   try {
     const { userId, name } = req.body;
 
@@ -36,8 +38,8 @@ router.post("/create", async (req, res) => {
   }
 });
 
-router.get("/get-unfinished-deck", async (req, res) => {
-  const { userId } = req.query;
+router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
+  const userId = req.user.userId;
 
   const unfinishedDeck = await prisma.deck.findFirst({
     where: { userId, finished: false },
@@ -47,9 +49,9 @@ router.get("/get-unfinished-deck", async (req, res) => {
   res.json(unfinishedDeck);
 });
 
-router.get("/deck/:id", async (req, res) => {
+router.get("/deck/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
-  const { userId } = req.query;
+  const userId = req.user.userId;
 
   try {
     if (!userId) {
@@ -77,10 +79,18 @@ router.get("/deck/:id", async (req, res) => {
   }
 });
 
-// TODO: We will need to update it so it returns all decks which are related to the authenticated user
-router.get("/all", async (req, res) => {
-  const decks = await prisma.deck.findMany({ where: { finished: true } });
-  res.json(decks);
+router.get("/all", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const decks = await prisma.deck.findMany({
+      where: { userId },
+    });
+
+    res.json(decks);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch decks" });
+  }
 });
 
 export default router;
