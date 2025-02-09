@@ -1,10 +1,10 @@
-import Home from "./components/Home";
-import CreateDeck from "./components/CreateDeck";
-import Header from "./components/Header";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+import Home from "./components/Home";
+import CreateDeck from "./components/CreateDeck";
+import Header from "./components/Header";
+import LoginPage from "./components/LoginPage";
 import { DeckProvider } from "./components/DeckContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -18,11 +18,7 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
+    setIsAuthenticated(!!token);
   }, []);
 
   return (
@@ -31,6 +27,7 @@ function App() {
         <div className="flex flex-col">
           {isAuthenticated && <Header />}
           <Routes>
+            <Route path="/login" element={<LoginPage />} />
             <Route
               path="/"
               element={

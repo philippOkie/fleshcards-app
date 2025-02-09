@@ -1,11 +1,13 @@
-import LoginPage from "./LoginPage";
+import { Navigate } from "react-router-dom";
 
-function ProtectedRoute() {
-  return (
-    <div className="flex justify-center align-center h-screen pt-32 pb-32 pl-150 pr-150">
-      <LoginPage />
-    </div>
-  );
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 }
 
 export default ProtectedRoute;
