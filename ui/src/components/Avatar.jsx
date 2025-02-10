@@ -1,4 +1,13 @@
-function Avatar() {
+import { useNavigate } from "react-router-dom";
+
+function Avatar({ onLogout }) {
+  const navigate = useNavigate();
+
+  const handleLogoutBtnClick = () => {
+    onLogout();
+    navigate("/login");
+  };
+
   return (
     <div className="dropdown dropdown-end">
       <button tabIndex={0} className="btn btn-circle avatar">
@@ -13,7 +22,7 @@ function Avatar() {
           <a>Change Avatar</a>
         </li>
         <li>
-          <a>Logout</a>
+          <a onClick={handleLogoutBtnClick}>Logout</a>
         </li>
       </ul>
     </div>

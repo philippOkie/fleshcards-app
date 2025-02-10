@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function LoginPage() {
+function LoginPage({ onLogin }) {
   const [emailOrLogin, setEmailOrLogin] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
 
   const handleEmailOrLoginChange = (e) => {
     setEmailOrLogin(e.target.value);
@@ -28,6 +37,9 @@ function LoginPage() {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
+
+        onLogin();
+        navigate("/");
       } else {
         console.error(`Error: ${response.status} - ${await response.text()}`);
       }
@@ -63,7 +75,7 @@ function LoginPage() {
             </div>
 
             <input
-              type="text"
+              type="password"
               onChange={handlePasswordChange}
               className="input input-bordered w-full"
             />

@@ -1,14 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDeck } from "./DeckContext";
-
 import Avatar from "./Avatar";
 
-function Header() {
+function Header({ onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { unfinishedDeck } = useDeck();
-
   const isDeckPage = location.pathname.startsWith("/deck/");
 
   const handlePlusClick = async () => {
@@ -81,7 +79,7 @@ function Header() {
       </div>
 
       <div className="navbar-end pr-10">
-        <Avatar />
+        <Avatar onLogout={onLogout} />
       </div>
     </div>
   );

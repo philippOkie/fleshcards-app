@@ -21,13 +21,25 @@ function App() {
     setIsAuthenticated(!!token);
   }, []);
 
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("token");
+  };
+
   return (
     <Router>
       <DeckProvider>
         <div className="flex flex-col">
-          {isAuthenticated && <Header />}
+          {isAuthenticated && <Header onLogout={handleLogout} />}
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/login"
+              element={<LoginPage onLogin={handleLogin} />}
+            />
             <Route
               path="/"
               element={
