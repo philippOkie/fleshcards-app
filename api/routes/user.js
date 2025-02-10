@@ -59,12 +59,12 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { loginOrEmail, login, password } = req.body;
+    const { loginOrEmail, password } = req.body;
 
     // Find user by login OR email
     const user = await prisma.user.findFirst({
       where: {
-        OR: [{ login: login }, { email: loginOrEmail }],
+        OR: [{ login: loginOrEmail }, { email: loginOrEmail }],
       },
     });
 

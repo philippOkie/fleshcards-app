@@ -78,8 +78,6 @@ function LoginPage() {
         </div>
 
         <div className="divider">OR</div>
-
-        <div></div>
       </div>
     </div>
   );
