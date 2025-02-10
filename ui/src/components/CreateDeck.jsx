@@ -7,6 +7,8 @@ import { useDeck } from "./DeckContext";
 function CreateDeck() {
   const { unfinishedDeck } = useDeck();
 
+  const [cards, setCards] = useState(unfinishedDeck?.cards || []);
+
   const [deckName, setDeckName] = useState(() => {
     return localStorage.getItem("deckName") || unfinishedDeck?.name || "";
   });
@@ -30,6 +32,32 @@ function CreateDeck() {
     return <p>No unfinished deck found or no cards available.</p>;
   }
 
+  const markDeckAsFinished = async () => {
+    const token = localStorage.getItem("token");
+    console.log(unfinishedDeck);
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/decks/set-finished-deck/${unfinishedDeck.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        console.log("Deck marked as finished successfully");
+      } else {
+        console.error("Failed to mark deck as finished");
+      }
+    } catch (error) {
+      console.error("Error marking deck as finished:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col mt-24">
       <div className="flex flex-col pl-48 pr-48 pb-12 gap-4 overflow-y-auto flex-1">
@@ -49,6 +77,8 @@ function CreateDeck() {
         setDeckName={setDeckName}
         deckTopics={deckTopics}
         setDeckTopics={setDeckTopics}
+        setFinishedDeck={markDeckAsFinished}
+        cards={cards}
       />
     </div>
   );

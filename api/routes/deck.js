@@ -82,6 +82,45 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
   res.json(unfinishedDeck);
 });
 
+router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
+  const user = req.user.id;
+  const { deckId } = req.params;
+
+  try {
+    const deck = await prisma.deck.findFirst({
+      where: {
+        id: Number(deckId),
+        userId: user.id,
+      },
+      include: {
+        cards: true,
+      },
+    });
+
+    if (!deck) {
+      return res
+        .status(404)
+        .json({ message: "Deck not found or does not belong to you." });
+    }
+
+    if (deck.cards.length === 0) {
+      return res.status(400).json({
+        message: "You must add at least one card to finish the deck.",
+      });
+    }
+
+    const updatedDeck = await prisma.deck.update({
+      where: { id: Number(deckId) },
+      data: { finished: true },
+    });
+
+    res.json(updatedDeck);
+  } catch (error) {
+    console.error("Error updating deck:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 router.get("/all", verifyToken, async (req, res) => {
   try {
     const user = req.user.id;
