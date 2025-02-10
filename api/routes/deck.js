@@ -1,16 +1,16 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 
+import { verifyToken } from "../utils/auth.js";
+
 const router = express.Router();
 const prisma = new PrismaClient();
 
-import { verifyToken } from "../utils/auth.js";
-
 router.get("/deck/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-  const user = req.user.id;
-
   try {
+    const { id } = req.params;
+    const user = req.user.id;
+
     if (!user) {
       return res.status(400).json({ message: "user is required" });
     }

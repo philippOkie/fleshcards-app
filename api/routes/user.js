@@ -3,12 +3,12 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
+import { generateToken } from "../utils/auth.js";
+
 const router = express.Router();
 const prisma = new PrismaClient();
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-import { generateToken } from "../utils/auth.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
 
