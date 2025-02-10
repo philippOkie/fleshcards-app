@@ -11,12 +11,38 @@ function Header() {
 
   const isDeckPage = location.pathname.startsWith("/deck/");
 
-  const handlePlusClick = () => {
+  const handlePlusClick = async () => {
+    const token = localStorage.getItem("token");
+
     if (isDeckPage) {
       navigate("/");
-    } else {
-      const deckId = unfinishedDeck?.id;
-      navigate(deckId ? `/deck/${deckId}` : "/");
+      return;
+    }
+
+    if (unfinishedDeck) {
+      navigate(`/deck/${unfinishedDeck.id}`);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/api/decks/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: "New Deck" }),
+      });
+
+      const data = await response.json();
+
+      if (data.deckId) {
+        navigate(`/deck/${data.deckId}`);
+      } else {
+        console.error("Failed to create deck:", data.message);
+      }
+    } catch (error) {
+      console.error("Error creating deck:", error);
     }
   };
 

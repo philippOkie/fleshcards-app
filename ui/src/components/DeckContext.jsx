@@ -9,8 +9,6 @@ export const useDeck = () => {
 export const DeckProvider = ({ children }) => {
   const [unfinishedDeck, setUnfinishedDeck] = useState(null);
 
-  const userId = "a4ec2f47-dfaa-44cc-8124-2ce595a7d562";
-
   useEffect(() => {
     const fetchUnfinishedDeck = async () => {
       try {
@@ -22,7 +20,7 @@ export const DeckProvider = ({ children }) => {
         }
 
         const response = await fetch(
-          `http://localhost:3000/api/decks/get-unfinished-deck?userId=${userId}`,
+          `http://localhost:3000/api/decks/get-unfinished-deck`,
           {
             method: "GET",
             headers: {
@@ -43,7 +41,7 @@ export const DeckProvider = ({ children }) => {
     };
 
     fetchUnfinishedDeck();
-  }, [userId]);
+  }, []);
 
   return (
     <DeckContext.Provider value={{ unfinishedDeck, setUnfinishedDeck }}>
