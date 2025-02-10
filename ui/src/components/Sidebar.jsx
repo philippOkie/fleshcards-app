@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 
 function Sidebar() {
   const [decks, setDecks] = useState([]);
-  const [selectedDeck, setSelectedDeck] = useState(null);
-  const [cards, setCards] = useState([]);
 
   useEffect(() => {
     const fetchAllDecks = async () => {
@@ -47,10 +45,7 @@ function Sidebar() {
 
       if (response.ok) {
         const data = await response.json();
-        setSelectedDeck(data);
-        setCards(data.cards);
-      } else {
-        console.error(`Error: ${response.status} - ${await response.text()}`);
+        console.log(data);
       }
     } catch (error) {
       console.error("Error fetching deck cards:", error);
@@ -78,19 +73,6 @@ function Sidebar() {
           </button>
         ))}
       </div>
-
-      {selectedDeck && (
-        <div className="border p-4 mt-4">
-          <h2 className="text-lg font-bold">{selectedDeck.name} - Cards</h2>
-          <ul className="list-disc pl-5">
-            {cards.length > 0 ? (
-              cards.map((card) => <li key={card.id}>{card.question}</li>)
-            ) : (
-              <p>No cards found</p>
-            )}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

@@ -38,6 +38,7 @@ function AddCardComp({ initialFrontText, initialBackText }) {
           onChange={(e) => setFrontText(e.target.value)}
           style={{ minHeight: "40px", fontSize: "16px" }}
         />
+
         <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg bg-base-100">
           img
         </button>
@@ -54,6 +55,7 @@ function AddCardComp({ initialFrontText, initialBackText }) {
           onChange={(e) => setBackText(e.target.value)}
           style={{ minHeight: "40px", fontSize: "16px" }}
         />
+
         <button className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg bg-base-100">
           img
         </button>

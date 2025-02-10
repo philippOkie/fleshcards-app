@@ -16,12 +16,10 @@ router.post("/register", async (req, res) => {
   try {
     const { login, password, name, email } = req.body;
 
-    // Validate email format
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
-    // Check if user already exists by login or email
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [{ login }, { email }],
@@ -34,11 +32,9 @@ router.post("/register", async (req, res) => {
         .json({ error: "User with this login or email already exists" });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await prisma.user.create({
       data: {
         login,
@@ -61,7 +57,6 @@ router.post("/login", async (req, res) => {
   try {
     const { loginOrEmail, password } = req.body;
 
-    // Find user by login OR email
     const user = await prisma.user.findFirst({
       where: {
         OR: [{ login: loginOrEmail }, { email: loginOrEmail }],
@@ -72,13 +67,11 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid login or password" });
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return res.status(401).json({ error: "Invalid login or password" });
     }
 
-    // Generate JWT Token
     const token = generateToken(user);
 
     res.json({

@@ -12,6 +12,7 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
           showAnswerBtnClicked={showAnswerBtnClicked}
           props={{ forwardText: "Hello", backText: "Привет" }}
         />
+
         <div className="flex justify-center mt-10">
           {showAnswerBtnClicked ? (
             <CardRateBtns />

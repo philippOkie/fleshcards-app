@@ -8,13 +8,13 @@ import { verifyToken } from "../utils/auth.js";
 
 router.post("/create", verifyToken, async (req, res) => {
   try {
-    const { userId, deckId, textForward, textBack } = req.body;
+    const user = req.user.id;
+    const { deckId, textForward, textBack } = req.body;
 
-    // Verify if the deck belongs to the user
     const deck = await prisma.deck.findFirst({
       where: {
         id: parseInt(deckId),
-        userId: userId,
+        userId: user.id,
       },
     });
 
@@ -24,7 +24,6 @@ router.post("/create", verifyToken, async (req, res) => {
         .json({ error: "Deck not found or does not belong to the user." });
     }
 
-    // Create the card
     const card = await prisma.card.create({
       data: {
         textForward,
@@ -45,13 +44,13 @@ router.post("/create", verifyToken, async (req, res) => {
 
 router.delete("/delete", verifyToken, async (req, res) => {
   try {
-    const { userId, deckId, cardId } = req.body;
+    const user = req.user.id;
+    const { deckId, cardId } = req.body;
 
-    // Verify if the deck belongs to the user
     const deck = await prisma.deck.findFirst({
       where: {
         id: parseInt(deckId),
-        userId: userId,
+        userId: user.id,
       },
     });
 
@@ -61,7 +60,6 @@ router.delete("/delete", verifyToken, async (req, res) => {
         .json({ error: "Deck not found or does not belong to the user." });
     }
 
-    // Verify if the card exists in the deck
     const card = await prisma.card.findFirst({
       where: {
         id: parseInt(cardId),
@@ -75,7 +73,6 @@ router.delete("/delete", verifyToken, async (req, res) => {
         .json({ error: "Card not found in the specified deck." });
     }
 
-    // Delete the card
     await prisma.card.delete({
       where: {
         id: parseInt(cardId),
