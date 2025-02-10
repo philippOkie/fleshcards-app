@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 
 function Sidebar() {
   const [decks, setDecks] = useState([]);
+  const [selectedDeck, setSelectedDeck] = useState(null);
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    const fetchUnfinishedDeck = async () => {
+    const fetchAllDecks = async () => {
       try {
         const token = localStorage.getItem("token");
 
@@ -22,12 +24,38 @@ function Sidebar() {
           console.error(`Error: ${response.status} - ${await response.text()}`);
         }
       } catch (error) {
-        console.error("Error fetching unfinished deck:", error);
+        console.error("Error fetching decks:", error);
       }
     };
 
-    fetchUnfinishedDeck();
+    fetchAllDecks();
   }, []);
+
+  const fetchDeckCards = async (deckId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `http://localhost:3000/api/decks/deck/${deckId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedDeck(data);
+        setCards(data.cards);
+      } else {
+        console.error(`Error: ${response.status} - ${await response.text()}`);
+      }
+    } catch (error) {
+      console.error("Error fetching deck cards:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -40,12 +68,29 @@ function Sidebar() {
       </div>
 
       <div className="flex flex-col gap-2 h-162 overflow-y-auto border pr-4">
-        {decks.map((deck, index) => (
-          <button key={index} className="btn btn-neutral">
+        {decks.map((deck) => (
+          <button
+            key={deck.id}
+            className="btn btn-neutral"
+            onClick={() => fetchDeckCards(deck.id)}
+          >
             {deck.name}
           </button>
         ))}
       </div>
+
+      {selectedDeck && (
+        <div className="border p-4 mt-4">
+          <h2 className="text-lg font-bold">{selectedDeck.name} - Cards</h2>
+          <ul className="list-disc pl-5">
+            {cards.length > 0 ? (
+              cards.map((card) => <li key={card.id}>{card.question}</li>)
+            ) : (
+              <p>No cards found</p>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

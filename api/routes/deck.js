@@ -8,7 +8,8 @@ import { verifyToken } from "../utils/auth.js";
 
 router.post("/create", verifyToken, async (req, res) => {
   try {
-    const { userId, name } = req.body;
+    const { name } = req.body;
+    const userId = req.user.id;
 
     const existingDeck = await prisma.deck.findFirst({
       where: { userId, finished: false },
@@ -51,11 +52,11 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
 
 router.get("/deck/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.userId;
+  const user = req.user.id;
 
   try {
-    if (!userId) {
-      return res.status(400).json({ message: "userId is required" });
+    if (!user) {
+      return res.status(400).json({ message: "user is required" });
     }
 
     const deck = await prisma.deck.findUnique({
@@ -67,13 +68,15 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Deck not found" });
     }
 
-    if (deck.userId !== userId) {
+    if (deck.userId !== user.id) {
       return res
         .status(403)
         .json({ message: "You do not have permission to view this deck" });
     }
 
-    res.json(deck);
+    const { userId: removedUserId, ...deckWithoutUserId } = deck;
+
+    res.json(deckWithoutUserId);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
