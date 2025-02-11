@@ -1,7 +1,7 @@
 import AddCardComp from "./AddCardComp";
 import CreateDeckFooter from "./CreateDeckFooter";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useDeck } from "./DeckContext";
@@ -10,6 +10,8 @@ function CreateDeck() {
   const { unfinishedDeck, setUnfinishedDeck } = useDeck();
   const [cards, setCards] = useState([]);
   const navigate = useNavigate();
+  const bottomRef = useRef(null);
+
   const token = localStorage.getItem("token");
 
   const [deckName, setDeckName] = useState(
@@ -85,6 +87,9 @@ function CreateDeck() {
 
       const data = await response.json();
       setCards((prevCards) => [...prevCards, data.card]);
+
+      // Scroll to the bottom after adding the card
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error adding card:", error);
     }
@@ -166,6 +171,8 @@ function CreateDeck() {
           </div>
         )}
       </div>
+
+      <div ref={bottomRef}></div>
 
       <CreateDeckFooter
         deckName={deckName}
