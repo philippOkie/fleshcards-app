@@ -15,7 +15,7 @@ function CreateDeck() {
   const token = localStorage.getItem("token");
 
   const [deckName, setDeckName] = useState(
-    () => localStorage.getItem("deckName") || unfinishedDeck?.name || ""
+    () => unfinishedDeck?.name || localStorage.getItem("deckName") || ""
   );
 
   const [deckTopics, setDeckTopics] = useState(() => {

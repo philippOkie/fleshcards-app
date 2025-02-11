@@ -43,7 +43,7 @@ function CreateDeckFooter({
         <input
           type="text"
           style={{ width: "600px" }}
-          placeholder='You can add topics here "@anatomy @english_spanish"'
+          placeholder='Add topics to categorize your deck (e.g. @math, @history)"'
           className="input w-full max-w-lg"
           value={deckTopics}
           onChange={(e) => setDeckTopics(e.target.value)}
