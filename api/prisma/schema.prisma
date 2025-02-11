@@ -27,7 +27,7 @@ model User {
 }
 
 model Deck {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid()) // Change from Int to String with UUID
   name     String
   userId   String
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -46,6 +46,6 @@ model Card {
   interval        Int     @default(1)
   repetitions     Int     @default(0)
   reviewDate      DateTime
-  deckId         Int
-  deck           Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
-}
+  deckId          String
+  deck            Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
+} 

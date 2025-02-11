@@ -16,7 +16,7 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
     }
 
     const deck = await prisma.deck.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: id },
       include: { cards: true },
     });
 

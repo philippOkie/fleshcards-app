@@ -13,7 +13,7 @@ router.post("/create", verifyToken, async (req, res) => {
 
     const deck = await prisma.deck.findFirst({
       where: {
-        id: parseInt(deckId),
+        id: deckId,
         userId: user.id,
       },
     });
@@ -29,7 +29,7 @@ router.post("/create", verifyToken, async (req, res) => {
         textForward,
         textBack,
         reviewDate: new Date(),
-        deckId: parseInt(deckId),
+        deckId: deckId,
       },
     });
 
@@ -49,7 +49,7 @@ router.delete("/delete", verifyToken, async (req, res) => {
 
     const deck = await prisma.deck.findFirst({
       where: {
-        id: parseInt(deckId),
+        id: deckId,
         userId: user.id,
       },
     });
@@ -63,7 +63,7 @@ router.delete("/delete", verifyToken, async (req, res) => {
     const card = await prisma.card.findFirst({
       where: {
         id: parseInt(cardId),
-        deckId: parseInt(deckId),
+        deckId: deckId,
       },
     });
 
