@@ -22,25 +22,56 @@ function Header({ onLogout }) {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/decks/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: "New Deck" }),
-      });
+      const deckResponse = await fetch(
+        "http://localhost:3000/api/decks/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ name: "New Deck" }),
+        }
+      );
 
-      const result = await response.json();
+      const deckResult = await deckResponse.json();
 
-      if (result.deckId) {
-        setUnfinishedDeck({ id: result.deckId, name: "New Deck", topics: [] });
-        navigate(`/deck/${result.deckId}`);
+      if (deckResult.deckId) {
+        setUnfinishedDeck({
+          id: deckResult.deckId,
+          name: "New Deck",
+          topics: [],
+        });
+
+        const cardResponse = await fetch(
+          "http://localhost:3000/api/cards/create",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              deckId: deckResult.deckId,
+              content: "New Card",
+            }),
+          }
+        );
+
+        const cardResult = await cardResponse.json();
+
+        if (cardResult.cardId) {
+          console.log("Card created successfully:", cardResult);
+        } else {
+          console.error("Failed to create card:", cardResult.message);
+        }
+
+        navigate(`/deck/${deckResult.deckId}`);
       } else {
-        console.error("Failed to create deck:", result.message);
+        console.error("Failed to create deck:", deckResult.message);
       }
     } catch (error) {
-      console.error("Error creating deck:", error);
+      console.error("Error creating deck and card:", error);
     }
   };
 
