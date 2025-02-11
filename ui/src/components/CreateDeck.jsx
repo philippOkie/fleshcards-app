@@ -149,7 +149,7 @@ function CreateDeck() {
 
   return (
     <div className="flex flex-col mt-24">
-      <div className="flex flex-col pl-48 pr-48 pb-12 gap-4 overflow-y-auto flex-1">
+      <div className="flex flex-col pl-48 pr-48 pb-24 gap-4 overflow-y-auto flex-1">
         {cards.length > 0 ? (
           cards.map((card, index) => (
             <AddCardComp
@@ -157,6 +157,7 @@ function CreateDeck() {
               initialFrontText={card.textForward}
               initialBackText={card.textBack}
               onDelete={() => handleDeleteCard(card.id)}
+              number={index + 1}
             />
           ))
         ) : (
@@ -164,10 +165,6 @@ function CreateDeck() {
             <span>No cards added yet.</span>
           </div>
         )}
-
-        <button className="btn btn-primary btn-block" onClick={handleAddCard}>
-          ADD CARD
-        </button>
       </div>
 
       <CreateDeckFooter
@@ -177,6 +174,7 @@ function CreateDeck() {
         setDeckTopics={setDeckTopics}
         setFinishedDeck={markDeckAsFinished}
         cards={cards}
+        handleAddCard={handleAddCard}
       />
     </div>
   );

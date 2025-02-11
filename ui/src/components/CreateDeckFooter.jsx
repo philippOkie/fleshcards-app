@@ -7,6 +7,7 @@ function CreateDeckFooter({
   setDeckTopics,
   cards,
   setFinishedDeck,
+  handleAddCard,
 }) {
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
 
@@ -29,7 +30,7 @@ function CreateDeckFooter({
   };
 
   return (
-    <footer className="flex flex-row justify-between bg-base-100 text-center p-6 pl-12 pr-12 w-full">
+    <footer className="flex flex-row justify-between fixed bottom-0 right-0 bg-base-100 text-center pt-4 pb-2 pl-12 pr-12 w-full">
       <div className="flex flex-row gap-8">
         <input
           type="text"
@@ -49,13 +50,19 @@ function CreateDeckFooter({
         />
       </div>
 
-      <button
-        className="btn btn-lg fixed btn-success bottom-6 right-12"
-        disabled={!isSaveEnabled}
-        onClick={handleSaveClick}
-      >
-        Save
-      </button>
+      <div className="flex gap-4">
+        <button className="btn btn-lg btn-primary" onClick={handleAddCard}>
+          Add Card
+        </button>
+
+        <button
+          className="btn btn-lg btn-success"
+          disabled={!isSaveEnabled}
+          onClick={handleSaveClick}
+        >
+          Save
+        </button>
+      </div>
     </footer>
   );
 }

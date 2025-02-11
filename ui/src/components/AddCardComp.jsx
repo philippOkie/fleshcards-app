@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-function AddCardComp({ initialFrontText, initialBackText, onDelete }) {
+function AddCardComp({ initialFrontText, initialBackText, onDelete, number }) {
   const [frontText, setFrontText] = useState(initialFrontText || "");
   const [backText, setBackText] = useState(initialBackText || "");
   const frontTextareaRef = useRef(null);
@@ -20,6 +20,12 @@ function AddCardComp({ initialFrontText, initialBackText, onDelete }) {
 
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
+      {number && (
+        <span className="absolute top-2 right-4 text-lg font-bold text-gray-600">
+          {number}
+        </span>
+      )}
+
       <button onClick={onDelete} className="absolute top-2 left-4">
         &times;
       </button>
