@@ -91,7 +91,7 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
   try {
     const deck = await prisma.deck.findFirst({
       where: {
-        id: Number(deckId),
+        id: deckId,
         userId: user.id,
       },
       include: {
@@ -112,7 +112,7 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
     }
 
     const updatedDeck = await prisma.deck.update({
-      where: { id: Number(deckId) },
+      where: { id: deckId },
       data: { finished: true },
     });
 
