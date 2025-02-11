@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useDeck } from "./DeckContext";
 
 function CreateDeck() {
-  const { unfinishedDeck } = useDeck();
+  const { unfinishedDeck, setUnfinishedDeck } = useDeck();
   const [cards, setCards] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -137,6 +137,7 @@ function CreateDeck() {
 
       if (response.ok) {
         console.log("Deck marked as finished successfully");
+        setUnfinishedDeck(null);
         navigate("/");
       } else {
         console.error("Failed to mark deck as finished");

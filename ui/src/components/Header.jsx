@@ -5,14 +5,13 @@ import Avatar from "./Avatar";
 function Header({ onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { unfinishedDeck, setUnfinishedDeck } = useDeck();
+  const isOnDeckPage = location.pathname.startsWith("/deck/");
 
-  const { unfinishedDeck } = useDeck();
-  const isDeckPage = location.pathname.startsWith("/deck/");
-
-  const handlePlusClick = async () => {
+  const handleCreateOrNavigateDeck = async () => {
     const token = localStorage.getItem("token");
 
-    if (isDeckPage) {
+    if (isOnDeckPage) {
       navigate("/");
       return;
     }
@@ -32,12 +31,13 @@ function Header({ onLogout }) {
         body: JSON.stringify({ name: "New Deck" }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (data.deckId) {
-        navigate(`/deck/${data.deckId}`);
+      if (result.deckId) {
+        setUnfinishedDeck({ id: result.deckId, name: "New Deck", topics: [] });
+        navigate(`/deck/${result.deckId}`);
       } else {
-        console.error("Failed to create deck:", data.message);
+        console.error("Failed to create deck:", result.message);
       }
     } catch (error) {
       console.error("Error creating deck:", error);
@@ -48,14 +48,12 @@ function Header({ onLogout }) {
     <div className="navbar bg-base-100 fixed z-10">
       <div className="navbar-start flex gap-2 items-center mb-2 mt-2 pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
-
         <button className="btn btn-neutral w-32 !text-xl">Decks</button>
-
         <button
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
-          onClick={handlePlusClick}
+          onClick={handleCreateOrNavigateDeck}
         >
-          {isDeckPage ? (
+          {isOnDeckPage ? (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21">
               <g
                 fill="none"
@@ -77,7 +75,6 @@ function Header({ onLogout }) {
           )}
         </button>
       </div>
-
       <div className="navbar-end pr-10">
         <Avatar onLogout={onLogout} />
       </div>

@@ -31,7 +31,12 @@ export const DeckProvider = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          setUnfinishedDeck(data.id ? data : null);
+
+          if (data && data.id) {
+            setUnfinishedDeck(data);
+          } else {
+            setUnfinishedDeck(null);
+          }
         } else {
           console.error(`Error: ${response.status} - ${await response.text()}`);
         }
