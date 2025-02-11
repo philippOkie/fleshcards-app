@@ -62,7 +62,7 @@ function Sidebar() {
       <div className="form-control pr-4">
         <input
           type="text"
-          placeholder="Search by name"
+          placeholder="Search by name or topics"
           className="input input-bordered w-24 md:w-auto"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
