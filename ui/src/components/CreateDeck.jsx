@@ -1,17 +1,16 @@
 import AddCardComp from "./AddCardComp";
 import CreateDeckFooter from "./CreateDeckFooter";
-
 import { useState, useEffect } from "react";
 import { useDeck } from "./DeckContext";
 
 function CreateDeck() {
   const { unfinishedDeck } = useDeck();
+  const [cards, setCards] = useState([]);
+  const token = localStorage.getItem("token");
 
-  const [cards, setCards] = useState(unfinishedDeck?.cards || []);
-
-  const [deckName, setDeckName] = useState(() => {
-    return localStorage.getItem("deckName") || unfinishedDeck?.name || "";
-  });
+  const [deckName, setDeckName] = useState(
+    () => localStorage.getItem("deckName") || unfinishedDeck?.name || ""
+  );
 
   const [deckTopics, setDeckTopics] = useState(() => {
     const storedTopics = localStorage.getItem("deckTopics");
@@ -21,6 +20,34 @@ function CreateDeck() {
   });
 
   useEffect(() => {
+    const fetchCards = async () => {
+      if (!unfinishedDeck?.id) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/decks/deck/${unfinishedDeck.id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to fetch cards");
+
+        const data = await response.json();
+        setCards(data.cards);
+      } catch (error) {
+        console.error("Error fetching cards:", error);
+      }
+    };
+
+    fetchCards();
+  }, [unfinishedDeck?.id, token]);
+
+  useEffect(() => {
     localStorage.setItem("deckName", deckName);
   }, [deckName]);
 
@@ -28,48 +55,55 @@ function CreateDeck() {
     localStorage.setItem("deckTopics", JSON.stringify(deckTopics));
   }, [deckTopics]);
 
-  if (!unfinishedDeck || !unfinishedDeck.cards) {
-    return <p>No unfinished deck found or no cards available.</p>;
-  }
+  const handleAddCard = async () => {
+    if (!token || !unfinishedDeck?.id) {
+      console.error("Missing token or deckId");
+      return;
+    }
 
-  const markDeckAsFinished = async () => {
-    const token = localStorage.getItem("token");
-    console.log(unfinishedDeck);
+    const cardDetails = {
+      deckId: unfinishedDeck.id,
+      textForward: "Type your text here! (Front side)",
+      textBack: "Type your text here! (Back side)",
+    };
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/decks/set-finished-deck/${unfinishedDeck.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/cards/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(cardDetails),
+      });
 
-      if (response.ok) {
-        console.log("Deck marked as finished successfully");
-      } else {
-        console.error("Failed to mark deck as finished");
-      }
+      if (!response.ok) throw new Error("Failed to add card");
+
+      const data = await response.json();
+      setCards((prevCards) => [...prevCards, data.card]);
     } catch (error) {
-      console.error("Error marking deck as finished:", error);
+      console.error("Error adding card:", error);
     }
   };
 
   return (
     <div className="flex flex-col mt-24">
       <div className="flex flex-col pl-48 pr-48 pb-12 gap-4 overflow-y-auto flex-1">
-        {unfinishedDeck.cards.map((card, index) => (
-          <AddCardComp
-            key={index}
-            initialFrontText={card.textForward}
-            initialBackText={card.textBack}
-          />
-        ))}
+        {cards.length > 0 ? (
+          cards.map((card, index) => (
+            <AddCardComp
+              key={index}
+              initialFrontText={card.textForward}
+              initialBackText={card.textBack}
+            />
+          ))
+        ) : (
+          <p>No cards added yet.</p>
+        )}
 
-        <button className="btn btn-primary btn-block">ADD CARD</button>
+        <button className="btn btn-primary btn-block" onClick={handleAddCard}>
+          ADD CARD
+        </button>
       </div>
 
       <CreateDeckFooter
@@ -77,7 +111,7 @@ function CreateDeck() {
         setDeckName={setDeckName}
         deckTopics={deckTopics}
         setDeckTopics={setDeckTopics}
-        setFinishedDeck={markDeckAsFinished}
+        setFinishedDeck={() => console.log("Mark deck as finished")}
         cards={cards}
       />
     </div>
