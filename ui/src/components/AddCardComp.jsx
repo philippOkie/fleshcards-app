@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
-function AddCardComp({ initialFrontText, initialBackText }) {
+function AddCardComp({ initialFrontText, initialBackText, onDelete }) {
   const [frontText, setFrontText] = useState(initialFrontText || "");
   const [backText, setBackText] = useState(initialBackText || "");
   const frontTextareaRef = useRef(null);
@@ -18,14 +18,9 @@ function AddCardComp({ initialFrontText, initialBackText }) {
     autoResizeTextarea(backTextareaRef, backText);
   }, [frontText, backText]);
 
-  const handleDeleteCard = () => {
-    setFrontText("");
-    setBackText("");
-  };
-
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
-      <button onClick={handleDeleteCard} className="absolute top-2 left-4">
+      <button onClick={onDelete} className="absolute top-2 left-4">
         &times;
       </button>
 
