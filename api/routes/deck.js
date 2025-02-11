@@ -1,5 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import { v4 as uuidv4 } from "uuid";
 
 import { verifyToken } from "../utils/auth.js";
 
@@ -56,6 +57,7 @@ router.post("/create", verifyToken, async (req, res) => {
 
     const newDeck = await prisma.deck.create({
       data: {
+        id: uuidv4(),
         name,
         userId: user.id,
         finished: false,
