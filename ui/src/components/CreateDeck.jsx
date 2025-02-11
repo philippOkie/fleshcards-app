@@ -2,12 +2,14 @@ import AddCardComp from "./AddCardComp";
 import CreateDeckFooter from "./CreateDeckFooter";
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useDeck } from "./DeckContext";
 
 function CreateDeck() {
   const { unfinishedDeck } = useDeck();
   const [cards, setCards] = useState([]);
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   const [deckName, setDeckName] = useState(
@@ -135,6 +137,7 @@ function CreateDeck() {
 
       if (response.ok) {
         console.log("Deck marked as finished successfully");
+        navigate("/");
       } else {
         console.error("Failed to mark deck as finished");
       }
