@@ -37,8 +37,15 @@ function App() {
           {isAuthenticated && <Header onLogout={handleLogout} />}
           <Routes>
             <Route
-              path="/login"
-              element={<LoginPage onLogin={handleLogin} />}
+              path="/study/:deckId/:cardId"
+              element={
+                <ProtectedRoute>
+                  <Home
+                    showAnswerBtnClicked={showAnswerBtnClicked}
+                    handleShowAnswerBtnClick={handleShowAnswerBtnClick}
+                  />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/"
@@ -50,6 +57,22 @@ function App() {
                   />
                 </ProtectedRoute>
               }
+            />
+            {/* You can add a route for when no card is selected, showing the Sidebar only */}
+            <Route
+              path="/study/:deckId"
+              element={
+                <ProtectedRoute>
+                  <Home
+                    showAnswerBtnClicked={showAnswerBtnClicked}
+                    handleShowAnswerBtnClick={handleShowAnswerBtnClick}
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={<LoginPage onLogin={handleLogin} />}
             />
             <Route
               path="/deck/:id"

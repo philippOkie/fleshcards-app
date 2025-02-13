@@ -1,56 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Sidebar() {
-  const [decks, setDecks] = useState([]);
+function Sidebar({ decks }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchAllDecks = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const response = await fetch(`http://localhost:3000/api/decks/all`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setDecks(data);
-        } else {
-          console.error(`Error: ${response.status} - ${await response.text()}`);
-        }
-      } catch (error) {
-        console.error("Error fetching decks:", error);
-      }
-    };
-
-    fetchAllDecks();
-  }, []);
-
-  const fetchDeckCards = async (deckId) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-        `http://localhost:3000/api/decks/deck/${deckId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-      }
-    } catch (error) {
-      console.error("Error fetching deck cards:", error);
-    }
+  // Handle deck click, navigating to the study page
+  const handleDeckClick = (deckId) => {
+    navigate(`/study/${deckId}`);
   };
 
   const filteredDecks = decks.filter((deck) => {
@@ -75,13 +32,13 @@ function Sidebar() {
             <button
               key={deck.id}
               className="btn btn-neutral"
-              onClick={() => fetchDeckCards(deck.id)}
+              onClick={() => handleDeckClick(deck.id)}
             >
               {deck.name}
             </button>
           ))
         ) : (
-          <p>No matching decks found</p>
+          <p>No decks found</p>
         )}
       </div>
     </div>

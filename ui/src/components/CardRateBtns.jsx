@@ -1,10 +1,18 @@
-function CardRateBtns() {
+function CardRateBtns({ onNext }) {
   return (
     <div className="flex justify-center gap-2">
-      <button className="btn btn-outline btn-error w-32">Again</button>
-      <button className="btn btn-error w-32">Hard</button>
-      <button className="btn btn-warning w-32">Good</button>
-      <button className="btn btn-success w-32">Easy</button>
+      <button className="btn btn-outline btn-error w-32" onClick={onNext}>
+        Again
+      </button>
+      <button className="btn btn-error w-32" onClick={onNext}>
+        Hard
+      </button>
+      <button className="btn btn-warning w-32" onClick={onNext}>
+        Good
+      </button>
+      <button className="btn btn-success w-32" onClick={onNext}>
+        Easy
+      </button>
     </div>
   );
 }
