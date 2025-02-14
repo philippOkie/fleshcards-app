@@ -5,6 +5,7 @@ import Home from "./components/Home";
 import CreateDeck from "./components/CreateDeck";
 import Header from "./components/Header";
 import LoginPage from "./components/LoginPage";
+
 import { DeckProvider } from "./components/DeckContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -37,17 +38,6 @@ function App() {
           {isAuthenticated && <Header onLogout={handleLogout} />}
           <Routes>
             <Route
-              path="/study/:deckId/:cardId"
-              element={
-                <ProtectedRoute>
-                  <Home
-                    showAnswerBtnClicked={showAnswerBtnClicked}
-                    handleShowAnswerBtnClick={handleShowAnswerBtnClick}
-                  />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/"
               element={
                 <ProtectedRoute>
@@ -58,7 +48,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* You can add a route for when no card is selected, showing the Sidebar only */}
+
             <Route
               path="/study/:deckId"
               element={
@@ -70,10 +60,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
             <Route
               path="/login"
               element={<LoginPage onLogin={handleLogin} />}
             />
+
             <Route
               path="/deck/:id"
               element={

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+
 import Sidebar from "./Sidebar";
 import Card from "./Card";
 import CardRateBtns from "./CardRateBtns";
@@ -10,9 +11,8 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
   const [decks, setDecks] = useState([]);
   const [currentDeck, setCurrentDeck] = useState(null);
   const [cards, setCards] = useState([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0); // Track the current card index
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
-  // Fetch all decks
   useEffect(() => {
     const fetchAllDecks = async () => {
       try {
@@ -38,7 +38,6 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
     fetchAllDecks();
   }, []);
 
-  // Fetch cards when a deck is selected
   useEffect(() => {
     if (!deckId || !decks.length) return;
 
@@ -62,10 +61,9 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
           if (response.ok) {
             const data = await response.json();
             if (data.cards && data.cards.length > 0) {
-              setCards(data.cards); // Store cards in the state
+              setCards(data.cards);
             } else {
-              console.log("No cards in this deck");
-              setCards([]); // No cards found
+              setCards([]);
             }
           } else {
             console.error(`Error fetching cards: ${response.status}`);
@@ -116,8 +114,18 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
             </div>
           </div>
         ) : (
-          <div className="text-center">
-            <p>No cards available in this deck.</p>
+          <div className="card bg-neutral text-neutral-content w-290 p-4">
+            <div className="flex w-full flex-col border-opacity-50">
+              <div className="card bg-base-100 rounded-box grid h-80 place-items-center flex justify-center text-5xl">
+                Hello!
+              </div>
+
+              <div className="divider"></div>
+
+              <div className="card rounded-box grid h-80 place-items-center flex justify-center text-5xl">
+                <span>Please choose a deck to start!</span>
+              </div>
+            </div>
           </div>
         )}
       </div>
