@@ -7,6 +7,7 @@ function Card({ showAnswerBtnClicked, props }) {
         </div>
 
         <div className="divider"></div>
+
         {showAnswerBtnClicked ? (
           <div className="card bg-base-100 rounded-box grid h-80 place-items-center flex justify-center text-5xl">
             {props?.backText}

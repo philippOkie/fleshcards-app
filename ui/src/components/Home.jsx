@@ -7,11 +7,11 @@ import CardRateBtns from "./CardRateBtns";
 import ShowAnswerBtn from "./ShowAnswerBtn";
 
 function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
-  const { deckId, cardId } = useParams();
-  const [decks, setDecks] = useState([]);
   const [currentDeck, setCurrentDeck] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [cards, setCards] = useState([]);
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [decks, setDecks] = useState([]);
+  const { deckId, cardId } = useParams();
 
   useEffect(() => {
     const fetchAllDecks = async () => {
@@ -28,7 +28,7 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
           const data = await response.json();
           setDecks(data);
         } else {
-          console.error(`Error: ${response.status} - ${await response.text()}`);
+          console.error(`Error: ${response.status}`);
         }
       } catch (error) {
         console.error("Error fetching decks:", error);
@@ -77,18 +77,14 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
     }
   }, [deckId, decks]);
 
-  // Handle moving to the next card
+  const currentCard = cards[currentIndex];
+
   const handleNextCard = () => {
-    console.log(`Moved to card index: ${currentCardIndex + 1}`);
-    if (currentCardIndex < cards.length - 1) {
-      setCurrentCardIndex((prevIndex) => prevIndex + 1); // Move to the next card
-      handleShowAnswerBtnClick(false); // Reset showAnswerBtnClicked to false for next card
-    } else {
-      console.log("You've finished all the cards.");
+    if (currentIndex < cards.length - 1) {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+      handleShowAnswerBtnClick(false);
     }
   };
-
-  const currentCard = cards[currentCardIndex];
 
   return (
     <div className="flex pl-12 gap-18 mt-24">
@@ -103,6 +99,7 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
                 backText: currentCard.textBack,
               }}
             />
+
             <div className="flex justify-center mt-10">
               {showAnswerBtnClicked ? (
                 <CardRateBtns onNext={handleNextCard} />
@@ -117,13 +114,13 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
           <div className="card bg-neutral text-neutral-content w-290 p-4">
             <div className="flex w-full flex-col border-opacity-50">
               <div className="card bg-base-100 rounded-box grid h-80 place-items-center flex justify-center text-5xl">
-                Hello!
+                Choose a deck to start! Hello!
               </div>
 
               <div className="divider"></div>
 
               <div className="card rounded-box grid h-80 place-items-center flex justify-center text-5xl">
-                <span>Please choose a deck to start!</span>
+                <span>Please, choose a deck to start!</span>
               </div>
             </div>
           </div>

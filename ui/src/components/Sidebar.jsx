@@ -5,7 +5,6 @@ function Sidebar({ decks }) {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // Handle deck click, navigating to the study page
   const handleDeckClick = (deckId) => {
     navigate(`/study/${deckId}`);
   };
