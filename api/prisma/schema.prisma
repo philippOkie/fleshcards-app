@@ -27,7 +27,7 @@ model User {
 }
 
 model Deck {
-  id       String @id @default(uuid()) // Change from Int to String with UUID
+  id       String @id @default(uuid()) 
   name     String
   userId   String
   user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)

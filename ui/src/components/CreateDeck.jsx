@@ -8,25 +8,67 @@ import { useDeck } from "./DeckContext";
 
 function CreateDeck() {
   const { unfinishedDeck, setUnfinishedDeck } = useDeck();
-  const [cards, setCards] = useState([]);
+  const [deckCards, setDeckCards] = useState([]);
   const navigate = useNavigate();
   const bottomRef = useRef(null);
+  const authToken = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token");
-
-  const [deckName, setDeckName] = useState(
+  const [deckTitle, setDeckTitle] = useState(
     () => unfinishedDeck?.name || localStorage.getItem("deckName") || ""
   );
 
-  const [deckTopics, setDeckTopics] = useState(() => {
-    const storedTopics = localStorage.getItem("deckTopics");
-    return storedTopics
-      ? JSON.parse(storedTopics)
+  const [deckCategories, setDeckCategories] = useState(() => {
+    const storedCategories = localStorage.getItem("deckTopics");
+    return storedCategories
+      ? JSON.parse(storedCategories)
       : unfinishedDeck?.topics || [];
   });
 
   useEffect(() => {
-    const fetchCards = async () => {
+    if (unfinishedDeck?.name) setDeckTitle(unfinishedDeck.name);
+    if (unfinishedDeck?.topics) setDeckCategories(unfinishedDeck.topics);
+  }, [unfinishedDeck]);
+
+  useEffect(() => {
+    localStorage.setItem("deckName", deckTitle);
+  }, [deckTitle]);
+
+  useEffect(() => {
+    localStorage.setItem("deckTopics", JSON.stringify(deckCategories));
+  }, [deckCategories]);
+
+  const updateDeckInfo = async (field, value) => {
+    if (!unfinishedDeck?.id) return;
+
+    try {
+      await fetch(
+        `http://localhost:3000/api/decks/update/${unfinishedDeck.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ [field]: value }),
+        }
+      );
+    } catch (error) {
+      console.error("Error updating deck:", error);
+    }
+  };
+
+  const handleTitleChange = (newTitle) => {
+    setDeckTitle(newTitle);
+    updateDeckInfo("name", newTitle);
+  };
+
+  const handleCategoriesChange = (newCategories) => {
+    setDeckCategories(newCategories);
+    updateDeckInfo("topics", newCategories);
+  };
+
+  useEffect(() => {
+    const loadDeckCards = async () => {
       if (!unfinishedDeck?.id) return;
 
       try {
@@ -36,7 +78,7 @@ function CreateDeck() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${authToken}`,
             },
           }
         );
@@ -44,30 +86,22 @@ function CreateDeck() {
         if (!response.ok) throw new Error("Failed to fetch cards");
 
         const data = await response.json();
-        setCards(data.cards);
+        setDeckCards(data.cards);
       } catch (error) {
         console.error("Error fetching cards:", error);
       }
     };
 
-    fetchCards();
-  }, [unfinishedDeck?.id, token]);
+    loadDeckCards();
+  }, [unfinishedDeck?.id, authToken]);
 
-  useEffect(() => {
-    localStorage.setItem("deckName", deckName);
-  }, [deckName]);
-
-  useEffect(() => {
-    localStorage.setItem("deckTopics", JSON.stringify(deckTopics));
-  }, [deckTopics]);
-
-  const handleAddCard = async () => {
-    if (!token || !unfinishedDeck?.id) {
+  const addCard = async () => {
+    if (!authToken || !unfinishedDeck?.id) {
       console.error("Missing token or deckId");
       return;
     }
 
-    const cardDetails = {
+    const newCard = {
       deckId: unfinishedDeck.id,
       textForward: "Type your text here! (Front side)",
       textBack: "Type your text here! (Back side)",
@@ -78,56 +112,49 @@ function CreateDeck() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify(cardDetails),
+        body: JSON.stringify(newCard),
       });
 
       if (!response.ok) throw new Error("Failed to add card");
 
       const data = await response.json();
-      setCards((prevCards) => [...prevCards, data.card]);
+      setDeckCards((prevCards) => [...prevCards, data.card]);
 
-      // Scroll to the bottom after adding the card
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       console.error("Error adding card:", error);
     }
   };
 
-  const handleDeleteCard = async (cardIdToDelete) => {
-    const token = localStorage.getItem("token");
-
-    if (!token || !unfinishedDeck?.id) {
-      return;
-    }
+  const deleteCard = async (cardId) => {
+    if (!authToken || !unfinishedDeck?.id) return;
 
     try {
       const response = await fetch("http://localhost:3000/api/cards/delete", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           deckId: unfinishedDeck.id,
-          cardId: cardIdToDelete,
+          cardId: cardId,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete card");
-      }
+      if (!response.ok) throw new Error("Failed to delete card");
 
-      setCards((prevCards) =>
-        prevCards.filter((card) => card.id !== cardIdToDelete)
+      setDeckCards((prevCards) =>
+        prevCards.filter((card) => card.id !== cardId)
       );
     } catch (error) {
       console.error("Error deleting card:", error);
     }
   };
 
-  const markDeckAsFinished = async () => {
+  const finishDeck = async () => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/decks/set-finished-deck/${unfinishedDeck.id}`,
@@ -135,7 +162,7 @@ function CreateDeck() {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -155,13 +182,13 @@ function CreateDeck() {
   return (
     <div className="flex flex-col mt-24">
       <div className="flex flex-col pl-48 pr-48 pb-24 gap-4 overflow-y-auto flex-1">
-        {cards.length > 0 ? (
-          cards.map((card, index) => (
+        {deckCards.length > 0 ? (
+          deckCards.map((card, index) => (
             <AddCardComp
               key={index}
               initialFrontText={card.textForward}
               initialBackText={card.textBack}
-              onDelete={() => handleDeleteCard(card.id)}
+              onDelete={() => deleteCard(card.id)}
               number={index + 1}
             />
           ))
@@ -175,13 +202,13 @@ function CreateDeck() {
       <div ref={bottomRef}></div>
 
       <CreateDeckFooter
-        deckName={deckName}
-        setDeckName={setDeckName}
-        deckTopics={deckTopics}
-        setDeckTopics={setDeckTopics}
-        setFinishedDeck={markDeckAsFinished}
-        cards={cards}
-        handleAddCard={handleAddCard}
+        deckName={deckTitle}
+        setDeckName={handleTitleChange}
+        deckTopics={deckCategories}
+        setDeckTopics={handleCategoriesChange}
+        setFinishedDeck={finishDeck}
+        cards={deckCards}
+        handleAddCard={addCard}
       />
     </div>
   );

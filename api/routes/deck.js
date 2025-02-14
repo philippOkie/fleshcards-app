@@ -39,6 +39,41 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
   }
 });
 
+router.put("/update/:deckId", verifyToken, async (req, res) => {
+  try {
+    const { deckId } = req.params;
+    const updateData = req.body;
+    console.log("Update data received:", updateData);
+
+    const userId = req.user.id?.id || req.user.id;
+
+    const deck = await prisma.deck.findFirst({
+      where: { id: deckId, userId: userId },
+    });
+
+    if (!deck) {
+      return res
+        .status(404)
+        .json({ message: "Deck not found or unauthorized" });
+    }
+
+    const updatedDeck = await prisma.deck.update({
+      where: { id: deckId },
+      data: updateData,
+    });
+
+    res.json({
+      message: "Deck updated successfully",
+      updatedDeckId: updatedDeck.id,
+    });
+  } catch (error) {
+    console.error("Error updating deck:", error);
+    res.status(500).json({
+      error: error.message || "Failed to update deck",
+    });
+  }
+});
+
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const { name } = req.body;

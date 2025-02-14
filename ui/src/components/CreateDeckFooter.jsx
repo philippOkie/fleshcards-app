@@ -8,24 +8,78 @@ function CreateDeckFooter({
   cards,
   setFinishedDeck,
   handleAddCard,
+  unfinishedDeck,
+  token,
 }) {
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
+  const [currentDeckName, setCurrentDeckName] = useState(deckName);
+  const [currentDeckTopics, setCurrentDeckTopics] = useState(deckTopics);
 
   useEffect(() => {
-    if (cards.length > 0) {
-      setIsSaveEnabled(true);
-    } else {
-      setIsSaveEnabled(false);
-    }
+    setIsSaveEnabled(cards.length > 0);
   }, [cards]);
 
-  const handleSaveClick = async () => {
-    if (isSaveEnabled) {
-      setFinishedDeck();
+  useEffect(() => {
+    if (unfinishedDeck?.name) {
+      setDeckName(unfinishedDeck.name);
+      setCurrentDeckName(unfinishedDeck.name);
+    }
+    if (unfinishedDeck?.topics) {
+      setDeckTopics(unfinishedDeck.topics);
+      setCurrentDeckTopics(unfinishedDeck.topics);
+    }
+  }, [unfinishedDeck]);
 
-      console.log("Deck is marked as finished!");
-    } else {
-      console.error("Cannot finish deck: There must be at least one card.");
+  useEffect(() => {
+    localStorage.setItem("deckName", deckName);
+  }, [deckName]);
+
+  useEffect(() => {
+    localStorage.setItem("deckTopics", JSON.stringify(deckTopics));
+  }, [deckTopics]);
+
+  const updateDeck = async (field, value) => {
+    if (!unfinishedDeck?.id) return;
+    try {
+      await fetch(
+        `http://localhost:3000/api/decks/update/${unfinishedDeck.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ [field]: value }),
+        }
+      );
+    } catch (error) {
+      console.error("Error updating deck:", error);
+    }
+  };
+
+  const handleNameChange = (e) => {
+    setCurrentDeckName(e.target.value);
+  };
+
+  const handleNameBlur = () => {
+    if (currentDeckName !== deckName) {
+      setDeckName(currentDeckName);
+      updateDeck("name", currentDeckName);
+    }
+  };
+
+  const handleTopicsChange = (e) => {
+    const topicsArray = e.target.value
+      .split(",")
+      .map((topic) => topic.trim())
+      .filter((topic) => topic !== "");
+    setCurrentDeckTopics(topicsArray);
+  };
+
+  const handleTopicsBlur = () => {
+    if (JSON.stringify(currentDeckTopics) !== JSON.stringify(deckTopics)) {
+      setDeckTopics(currentDeckTopics);
+      updateDeck("topics", currentDeckTopics);
     }
   };
 
@@ -36,17 +90,19 @@ function CreateDeckFooter({
           type="text"
           placeholder="Type your deck name here!"
           className="input w-full max-w-xs"
-          value={deckName}
-          onChange={(e) => setDeckName(e.target.value)}
+          value={currentDeckName}
+          onChange={handleNameChange}
+          onBlur={handleNameBlur}
         />
 
         <input
           type="text"
           style={{ width: "600px" }}
-          placeholder='Add topics to categorize your deck (e.g. @math, @history)"'
+          placeholder="Add topics to categorize (math, english_spanish)"
           className="input w-full max-w-lg"
-          value={deckTopics}
-          onChange={(e) => setDeckTopics(e.target.value)}
+          value={currentDeckTopics.join(", ")}
+          onChange={handleTopicsChange}
+          onBlur={handleTopicsBlur}
         />
       </div>
 
@@ -58,7 +114,7 @@ function CreateDeckFooter({
         <button
           className="btn btn-lg btn-success"
           disabled={!isSaveEnabled}
-          onClick={handleSaveClick}
+          onClick={setFinishedDeck}
         >
           Save
         </button>
