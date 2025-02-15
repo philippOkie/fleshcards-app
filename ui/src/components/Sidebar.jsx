@@ -1,17 +1,32 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Sidebar({ decks }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDeck, setSelectedDeck] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const match = location.pathname.match(/\/study\/([a-f0-9-]{36})/);
+    if (match) {
+      setSelectedDeck(match[1]);
+    }
+  }, [location.pathname]);
 
   const handleDeckClick = (deckId) => {
+    setSelectedDeck(deckId);
+    localStorage.setItem("lastChosenDeck", deckId);
     navigate(`/study/${deckId}`);
   };
 
-  const filteredDecks = decks.filter((deck) => {
-    return deck.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const filteredDecks = decks
+    .filter((deck) =>
+      deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) =>
+      a.id === selectedDeck ? -1 : b.id === selectedDeck ? 1 : 0
+    );
 
   return (
     <div className="flex flex-col gap-6">
@@ -30,7 +45,9 @@ function Sidebar({ decks }) {
           filteredDecks.map((deck) => (
             <button
               key={deck.id}
-              className="btn btn-neutral"
+              className={`btn ${
+                deck.id === selectedDeck ? "btn-primary" : "btn-neutral"
+              }`}
               onClick={() => handleDeckClick(deck.id)}
             >
               {deck.name}
