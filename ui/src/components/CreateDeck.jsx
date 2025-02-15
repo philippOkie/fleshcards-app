@@ -155,6 +155,8 @@ function CreateDeck() {
   };
 
   const finishDeck = async () => {
+    if (!unfinishedDeck?.id) return;
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/decks/set-finished-deck/${unfinishedDeck.id}`,
@@ -167,17 +169,45 @@ function CreateDeck() {
         }
       );
 
-      if (response.ok) {
-        console.log("Deck marked as finished successfully");
-        setUnfinishedDeck(null);
-        navigate("/");
-      } else {
-        console.error("Failed to mark deck as finished");
+      if (!response.ok) {
+        throw new Error(await response.text());
       }
+
+      setUnfinishedDeck(null);
+      navigate("/");
     } catch (error) {
       console.error("Error marking deck as finished:", error);
     }
   };
+
+  const handleSaveCardText = async (cardId, field, value) => {
+    const numericCardId = Number(cardId);
+    if (isNaN(numericCardId)) {
+      throw new Error("Invalid card ID");
+    }
+
+    const response = await fetch(
+      `http://localhost:3000/api/cards/update/${numericCardId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          deckId: unfinishedDeck.id,
+          [field]: value,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return response.json();
+  };
+  const deckId = unfinishedDeck?.id;
 
   return (
     <div className="flex flex-col mt-24">
@@ -185,11 +215,14 @@ function CreateDeck() {
         {deckCards.length > 0 ? (
           deckCards.map((card, index) => (
             <AddCardComp
-              key={index}
+              key={card.id}
+              cardId={card.id}
+              deckId={deckId}
               initialFrontText={card.textForward}
               initialBackText={card.textBack}
               onDelete={() => deleteCard(card.id)}
               number={index + 1}
+              onSave={handleSaveCardText}
             />
           ))
         ) : (

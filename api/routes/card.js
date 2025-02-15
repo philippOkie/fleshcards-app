@@ -42,6 +42,48 @@ router.post("/create", verifyToken, async (req, res) => {
   }
 });
 
+router.put("/update/:cardId", verifyToken, async (req, res) => {
+  try {
+    const cardId = parseInt(req.params.cardId);
+    const { deckId, ...updateFields } = req.body;
+
+    const allowedFields = [
+      "textForward",
+      "textBack",
+      "imageUrlForward",
+      "imageUrlBack",
+    ];
+    const isValidUpdate = Object.keys(updateFields).some(
+      (field) =>
+        allowedFields.includes(field) && updateFields[field] !== undefined
+    );
+
+    if (!isValidUpdate) {
+      return res.status(400).json({
+        error: "At least one valid field required for update",
+        validFields: allowedFields,
+      });
+    }
+
+    const filteredUpdate = Object.keys(updateFields)
+      .filter((field) => allowedFields.includes(field))
+      .reduce((obj, field) => ({ ...obj, [field]: updateFields[field] }), {});
+
+    const updatedCard = await prisma.card.update({
+      where: { id: cardId },
+      data: filteredUpdate,
+    });
+
+    res.json({ message: "Card updated", updatedCard });
+  } catch (error) {
+    console.error("Update error:", error);
+    res.status(500).json({
+      error: "Server error",
+      details: error.message,
+    });
+  }
+});
+
 router.delete("/delete", verifyToken, async (req, res) => {
   try {
     const user = req.user.id;

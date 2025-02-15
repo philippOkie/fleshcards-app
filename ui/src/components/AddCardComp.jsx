@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 
-function AddCardComp({ initialFrontText, initialBackText, onDelete, number }) {
+function AddCardComp({
+  initialFrontText,
+  initialBackText,
+  onDelete,
+  number,
+  cardId,
+  onSave,
+}) {
   const [frontText, setFrontText] = useState(initialFrontText || "");
   const [backText, setBackText] = useState(initialBackText || "");
   const frontTextareaRef = useRef(null);
@@ -17,6 +24,13 @@ function AddCardComp({ initialFrontText, initialBackText, onDelete, number }) {
     autoResizeTextarea(frontTextareaRef, frontText);
     autoResizeTextarea(backTextareaRef, backText);
   }, [frontText, backText]);
+
+  const handleBlur = () => {
+    if (onSave) {
+      onSave(cardId, "textForward", frontText);
+      onSave(cardId, "textBack", backText);
+    }
+  };
 
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8">
@@ -37,6 +51,7 @@ function AddCardComp({ initialFrontText, initialBackText, onDelete, number }) {
           ref={frontTextareaRef}
           value={frontText}
           onChange={(e) => setFrontText(e.target.value)}
+          onBlur={handleBlur}
           style={{ minHeight: "40px", fontSize: "16px" }}
         />
 
@@ -54,6 +69,7 @@ function AddCardComp({ initialFrontText, initialBackText, onDelete, number }) {
           ref={backTextareaRef}
           value={backText}
           onChange={(e) => setBackText(e.target.value)}
+          onBlur={handleBlur}
           style={{ minHeight: "40px", fontSize: "16px" }}
         />
 
