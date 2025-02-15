@@ -13,7 +13,7 @@ function AddCardComp({
   const frontTextareaRef = useRef(null);
   const backTextareaRef = useRef(null);
 
-  const autoResizeTextarea = (textareaRef, text) => {
+  const autoResizeTextarea = (textareaRef) => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -21,8 +21,8 @@ function AddCardComp({
   };
 
   useEffect(() => {
-    autoResizeTextarea(frontTextareaRef, frontText);
-    autoResizeTextarea(backTextareaRef, backText);
+    autoResizeTextarea(frontTextareaRef);
+    autoResizeTextarea(backTextareaRef);
   }, [frontText, backText]);
 
   const handleBlur = () => {
