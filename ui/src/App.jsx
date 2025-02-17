@@ -34,7 +34,7 @@ function App() {
   return (
     <Router>
       <DeckProvider>
-        <div className="flex flex-col">
+        <div className="flex flex-col h-screen w-screen">
           {isAuthenticated && <Header onLogout={handleLogout} />}
           <Routes>
             <Route
