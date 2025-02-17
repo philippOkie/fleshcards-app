@@ -1,6 +1,5 @@
 DATABASE_URL = your_db_link;
 JWT_SECRET = paste_the_generated_string_here;
+UNSPLASH_ACCESS_KEY = your_access_key;
+UNSPLASH_SECRET_KEY = your_secret_key;
 PORT = your_port;
-
-// Generate a random JWT secret
-// node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

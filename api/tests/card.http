@@ -1,10 +1,9 @@
-### Add a Card to Deck 1
-POST http://localhost:3000/api/cards/create
+### Create card
+POST http://localhost:3000/cards/create
+Authorization: Bearer your_jwt_token
 Content-Type: application/json
 
 {
-  "userId": "a4ec2f47-dfaa-44cc-8124-2ce595a7d562",
-  "deckId": 1,
-  "textForward": "Hola",
-  "textBack": "Hello"
+  "textForward": "Front text",
+  "textBack": "Back text"
 }
