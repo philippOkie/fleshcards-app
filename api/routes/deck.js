@@ -39,6 +39,44 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
   }
 });
 
+router.delete("/deck/:id", verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user.id;
+
+    if (!user) {
+      return res.status(400).json({ message: "User is required" });
+    }
+
+    const deck = await prisma.deck.findUnique({
+      where: { id },
+      include: { cards: true },
+    });
+
+    if (!deck) {
+      return res.status(404).json({ message: "Deck not found" });
+    }
+
+    if (deck.userId !== user) {
+      return res
+        .status(403)
+        .json({ message: "You do not have permission to delete this deck" });
+    }
+
+    await prisma.card.deleteMany({
+      where: { deckId: id },
+    });
+
+    await prisma.deck.delete({
+      where: { id },
+    });
+
+    res.json({ message: "Deck deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.put("/update/:deckId", verifyToken, async (req, res) => {
   try {
     const { deckId } = req.params;

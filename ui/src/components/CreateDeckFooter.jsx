@@ -98,7 +98,7 @@ function CreateDeckFooter({
         <input
           type="text"
           style={{ width: "600px" }}
-          placeholder="Add topics to categorize (math, english_spanish)"
+          placeholder='Categorize your deck "math, english_spanish"'
           className="input w-full max-w-lg"
           value={currentDeckTopics.join(", ")}
           onChange={handleTopicsChange}
