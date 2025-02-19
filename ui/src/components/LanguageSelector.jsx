@@ -1,3 +1,42 @@
+const LANGUAGES = [
+  { code: "AR", name: "Arabic" },
+  { code: "BG", name: "Bulgarian" },
+  { code: "CS", name: "Czech" },
+  { code: "DA", name: "Danish" },
+  { code: "DE", name: "German" },
+  { code: "EL", name: "Greek" },
+  { code: "EN", name: "English" },
+  { code: "EN-GB", name: "English (British)" },
+  { code: "EN-US", name: "English (American)" },
+  { code: "ES", name: "Spanish" },
+  { code: "ET", name: "Estonian" },
+  { code: "FI", name: "Finnish" },
+  { code: "FR", name: "French" },
+  { code: "HU", name: "Hungarian" },
+  { code: "ID", name: "Indonesian" },
+  { code: "IT", name: "Italian" },
+  { code: "JA", name: "Japanese" },
+  { code: "KO", name: "Korean" },
+  { code: "LT", name: "Lithuanian" },
+  { code: "LV", name: "Latvian" },
+  { code: "NB", name: "Norwegian Bokmål" },
+  { code: "NL", name: "Dutch" },
+  { code: "PL", name: "Polish" },
+  { code: "PT", name: "Portuguese" },
+  { code: "PT-BR", name: "Portuguese (Brazilian)" },
+  { code: "PT-PT", name: "Portuguese (European)" },
+  { code: "RO", name: "Romanian" },
+  { code: "RU", name: "Russian" },
+  { code: "SK", name: "Slovak" },
+  { code: "SL", name: "Slovenian" },
+  { code: "SV", name: "Swedish" },
+  { code: "TR", name: "Turkish" },
+  { code: "UK", name: "Ukrainian" },
+  { code: "ZH", name: "Chinese" },
+  { code: "ZH-HANS", name: "Chinese (Simplified)" },
+  { code: "ZH-HANT", name: "Chinese (Traditional)" },
+];
+
 function LanguageSelector({ label, value, onChange }) {
   return (
     <select
@@ -6,15 +45,11 @@ function LanguageSelector({ label, value, onChange }) {
       onChange={(e) => onChange(e.target.value)}
     >
       <option value="">{label}</option>
-      <option value="arabic">Arabic</option>
-      <option value="english">English</option>
-      <option value="spanish">Spanish</option>
-      <option value="french">French</option>
-      <option value="german">German</option>
-      <option value="chinese">Chinese</option>
-      <option value="russian">Russian</option>
-      <option value="ukrainian">Ukrainian</option>
-      <option value="japanese">Japanese</option>
+      {LANGUAGES.map((lang) => (
+        <option key={lang.code} value={lang.code}>
+          {lang.name}
+        </option>
+      ))}
     </select>
   );
 }
