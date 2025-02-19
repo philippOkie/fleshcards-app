@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import LanguageSelector from "./LanguageSelector";
+
 function CreateDeckFooter({
   deckName,
   setDeckName,
@@ -14,6 +16,12 @@ function CreateDeckFooter({
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
   const [currentDeckName, setCurrentDeckName] = useState(deckName);
   const [currentDeckTopics, setCurrentDeckTopics] = useState(deckTopics);
+  const [targetLanguage, setTargetLanguage] = useState(
+    localStorage.getItem("targetLanguage") || ""
+  );
+  const [nativeLanguage, setNativeLanguage] = useState(
+    localStorage.getItem("nativeLanguage") || ""
+  );
 
   useEffect(() => {
     setIsSaveEnabled(cards.length > 0);
@@ -28,6 +36,12 @@ function CreateDeckFooter({
       setDeckTopics(unfinishedDeck.topics);
       setCurrentDeckTopics(unfinishedDeck.topics);
     }
+    if (unfinishedDeck?.targetLanguage) {
+      setTargetLanguage(unfinishedDeck.targetLanguage);
+    }
+    if (unfinishedDeck?.nativeLanguage) {
+      setNativeLanguage(unfinishedDeck.nativeLanguage);
+    }
   }, [unfinishedDeck]);
 
   useEffect(() => {
@@ -37,6 +51,14 @@ function CreateDeckFooter({
   useEffect(() => {
     localStorage.setItem("deckTopics", JSON.stringify(deckTopics));
   }, [deckTopics]);
+
+  useEffect(() => {
+    localStorage.setItem("targetLanguage", targetLanguage);
+  }, [targetLanguage]);
+
+  useEffect(() => {
+    localStorage.setItem("nativeLanguage", nativeLanguage);
+  }, [nativeLanguage]);
 
   const updateDeck = async (field, value) => {
     if (!unfinishedDeck?.id) return;
@@ -57,32 +79,6 @@ function CreateDeckFooter({
     }
   };
 
-  const handleNameChange = (e) => {
-    setCurrentDeckName(e.target.value);
-  };
-
-  const handleNameBlur = () => {
-    if (currentDeckName !== deckName) {
-      setDeckName(currentDeckName);
-      updateDeck("name", currentDeckName);
-    }
-  };
-
-  const handleTopicsChange = (e) => {
-    const topicsArray = e.target.value
-      .split(",")
-      .map((topic) => topic.trim())
-      .filter((topic) => topic !== "");
-    setCurrentDeckTopics(topicsArray);
-  };
-
-  const handleTopicsBlur = () => {
-    if (JSON.stringify(currentDeckTopics) !== JSON.stringify(deckTopics)) {
-      setDeckTopics(currentDeckTopics);
-      updateDeck("topics", currentDeckTopics);
-    }
-  };
-
   return (
     <footer className="flex flex-row justify-between fixed bottom-0 right-0 bg-base-100 text-center pt-4 pb-2 pl-12 pr-12 w-full">
       <div className="flex flex-row gap-8">
@@ -91,8 +87,13 @@ function CreateDeckFooter({
           placeholder="Type your deck name here!"
           className="input w-full max-w-xs"
           value={currentDeckName}
-          onChange={handleNameChange}
-          onBlur={handleNameBlur}
+          onChange={(e) => setCurrentDeckName(e.target.value)}
+          onBlur={() => {
+            if (currentDeckName !== deckName) {
+              setDeckName(currentDeckName);
+              updateDeck("name", currentDeckName);
+            }
+          }}
         />
 
         <input
@@ -101,8 +102,40 @@ function CreateDeckFooter({
           placeholder='Categorize your deck "math, english_spanish"'
           className="input w-full max-w-lg"
           value={currentDeckTopics.join(", ")}
-          onChange={handleTopicsChange}
-          onBlur={handleTopicsBlur}
+          onChange={(e) =>
+            setCurrentDeckTopics(
+              e.target.value
+                .split(",")
+                .map((topic) => topic.trim())
+                .filter((topic) => topic !== "")
+            )
+          }
+          onBlur={() => {
+            if (
+              JSON.stringify(currentDeckTopics) !== JSON.stringify(deckTopics)
+            ) {
+              setDeckTopics(currentDeckTopics);
+              updateDeck("topics", currentDeckTopics);
+            }
+          }}
+        />
+
+        <LanguageSelector
+          label="Target Language"
+          value={targetLanguage}
+          onChange={(value) => {
+            setTargetLanguage(value);
+            updateDeck("targetLanguage", value);
+          }}
+        />
+
+        <LanguageSelector
+          label="Native Language"
+          value={nativeLanguage}
+          onChange={(value) => {
+            setNativeLanguage(value);
+            updateDeck("nativeLanguage", value);
+          }}
         />
       </div>
 
