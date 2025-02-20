@@ -56,8 +56,16 @@ router.post("/create", verifyToken, async (req, res) => {
         .json({ error: "Deck not found or does not belong to the user." });
     }
 
+    const maxCard = await prisma.card.findFirst({
+      where: { deckId: deckId },
+      orderBy: { id: "desc" },
+    });
+
+    const nextCardId = maxCard ? maxCard.id + 1 : 1;
+
     const card = await prisma.card.create({
       data: {
+        id: nextCardId,
         textForward,
         textBack,
         reviewDate: new Date(),
@@ -70,6 +78,7 @@ router.post("/create", verifyToken, async (req, res) => {
       card,
     });
   } catch (error) {
+    console.error("Error adding card:", error);
     res.status(500).json({ error: error.message });
   }
 });

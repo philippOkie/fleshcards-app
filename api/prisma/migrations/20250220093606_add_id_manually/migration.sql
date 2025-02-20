@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Card" ALTER COLUMN "id" DROP DEFAULT;
+DROP SEQUENCE "Card_id_seq";
