@@ -5,6 +5,7 @@ import cors from "cors";
 import userRouter from "./routes/user.js";
 import deckRouter from "./routes/deck.js";
 import cardRouter from "./routes/card.js";
+import serviceRouter from "./routes/service.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use("/api/user", userRouter);
 app.use("/api/decks", deckRouter);
 app.use("/api/cards", cardRouter);
+app.use("/api/service", serviceRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

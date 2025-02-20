@@ -6,43 +6,6 @@ import { verifyToken } from "../utils/auth.js";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-router.get("/pictures", async (req, res) => {
-  const query = req.query.query && req.query.query.trim();
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter is required" });
-  }
-  const page = req.query.page || 1;
-  const per_page = req.query.per_page || 7;
-  const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
-
-  try {
-    const response = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
-        query
-      )}&page=${page}&per_page=${per_page}`,
-      {
-        headers: {
-          Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: "Unsplash API error" });
-    }
-
-    const data = await response.json();
-    const pictures = data.results.map((pic) => ({
-      id: pic.id,
-      urls: pic.urls.small,
-      alt_description: pic.alt_description || "Unsplash Image",
-    }));
-    res.json({ results: pictures });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const user = req.user.id;
