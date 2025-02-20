@@ -6,6 +6,8 @@ function PicturePicker({ side, query, onSelectImage }) {
   const [error, setError] = useState(null);
   const cacheRef = useRef({});
 
+  const authToken = localStorage.getItem("token");
+
   useEffect(() => {
     if (!query || query.trim() === "") {
       setPictures([]);
@@ -22,9 +24,15 @@ function PicturePicker({ side, query, onSelectImage }) {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/api/cards/pictures?query=${encodeURIComponent(
+          `http://localhost:3000/api/service/pictures?query=${encodeURIComponent(
             query
-          )}&page=1&per_page=7`
+          )}&page=1&per_page=7`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
         );
 
         if (!response.ok) {

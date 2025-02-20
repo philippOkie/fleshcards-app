@@ -9,6 +9,13 @@ import { useDeck } from "./DeckContext";
 function CreateDeck() {
   const { unfinishedDeck, setUnfinishedDeck } = useDeck();
   const [deckCards, setDeckCards] = useState([]);
+  const [targetLanguage, setTargetLanguage] = useState(
+    localStorage.getItem("targetLanguage") || ""
+  );
+  const [nativeLanguage, setNativeLanguage] = useState(
+    localStorage.getItem("nativeLanguage") || ""
+  );
+
   const navigate = useNavigate();
   const bottomRef = useRef(null);
   const authToken = localStorage.getItem("token");
@@ -225,6 +232,8 @@ function CreateDeck() {
               onSave={handleSaveCardText}
               initialImageUrlForward={card.imageUrlForward}
               initialImageUrlBack={card.imageUrlBack}
+              targetLanguage={targetLanguage}
+              nativeLanguage={nativeLanguage}
             />
           ))
         ) : (
@@ -244,6 +253,10 @@ function CreateDeck() {
         setFinishedDeck={finishDeck}
         cards={deckCards}
         handleAddCard={addCard}
+        targetLanguage={targetLanguage}
+        setTargetLanguage={setTargetLanguage}
+        nativeLanguage={nativeLanguage}
+        setNativeLanguage={setNativeLanguage}
       />
     </div>
   );

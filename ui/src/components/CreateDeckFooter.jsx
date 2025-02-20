@@ -12,16 +12,23 @@ function CreateDeckFooter({
   handleAddCard,
   unfinishedDeck,
   token,
+  targetLanguage,
+  setTargetLanguage,
+  nativeLanguage,
+  setNativeLanguage,
 }) {
   const [isSaveEnabled, setIsSaveEnabled] = useState(false);
   const [currentDeckName, setCurrentDeckName] = useState(deckName);
   const [currentDeckTopics, setCurrentDeckTopics] = useState(deckTopics);
-  const [targetLanguage, setTargetLanguage] = useState(
-    localStorage.getItem("targetLanguage") || ""
-  );
-  const [nativeLanguage, setNativeLanguage] = useState(
-    localStorage.getItem("nativeLanguage") || ""
-  );
+
+  useEffect(() => {
+    if (unfinishedDeck?.targetLanguage) {
+      setTargetLanguage(unfinishedDeck.targetLanguage);
+    }
+    if (unfinishedDeck?.nativeLanguage) {
+      setNativeLanguage(unfinishedDeck.nativeLanguage);
+    }
+  }, [unfinishedDeck]);
 
   useEffect(() => {
     const allCardsFilled = cards.every(
@@ -123,19 +130,15 @@ function CreateDeckFooter({
         />
 
         <LanguageSelector
-          label="Target Language"
+          label="Native Language"
           value={targetLanguage}
-          onChange={(value) => {
-            setTargetLanguage(value);
-          }}
+          onChange={setTargetLanguage}
         />
 
         <LanguageSelector
-          label="Native Language"
+          label="Target Language"
           value={nativeLanguage}
-          onChange={(value) => {
-            setNativeLanguage(value);
-          }}
+          onChange={setNativeLanguage}
         />
       </div>
 

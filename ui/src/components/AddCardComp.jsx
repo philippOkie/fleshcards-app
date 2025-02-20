@@ -11,6 +11,8 @@ function AddCardComp({
   onSave,
   initialImageUrlForward = "",
   initialImageUrlBack = "",
+  targetLanguage,
+  nativeLanguage,
 }) {
   const [frontText, setFrontText] = useState(initialFrontText);
   const [backText, setBackText] = useState(initialBackText);
@@ -23,6 +25,8 @@ function AddCardComp({
   const backTextareaRef = useRef(null);
   const frontImageRef = useRef(null);
   const backImageRef = useRef(null);
+
+  const authToken = localStorage.getItem("token");
 
   const autoResizeTextarea = (textareaRef, imageRef) => {
     if (textareaRef.current && imageRef.current) {
@@ -87,9 +91,63 @@ function AddCardComp({
 
   const renderImageBoxContent = (side) => {
     const imageUrl = side === "front" ? frontImageUrl : backImageUrl;
-
     if (!imageUrl)
       return <span className="text-gray-500 font-bold">IMAGE</span>;
+  };
+
+  const translateText = async (text, sourceLang, targetLang) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:3000/api/service/translate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            text,
+            sourceLanguage: sourceLang || "", // Ensure this is passed as empty if not set
+            targetLanguage: targetLang,
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Translation failed");
+
+      const data = await response.json();
+      return data.translations[0].text; // Assuming the API returns { translations: [{ text: "translated text" }] }
+    } catch (error) {
+      console.error("Translation error:", error);
+      return "";
+    }
+  };
+
+  const handleFrontBlur = async () => {
+    if (frontText.trim() && targetLanguage && nativeLanguage) {
+      const translatedText = await translateText(
+        frontText,
+        nativeLanguage,
+        targetLanguage
+      );
+      setBackText(translatedText); // Set the translation for the back side
+      onSave(cardId, "textForward", frontText); // Save the front text
+      onSave(cardId, "textBack", translatedText); // Save the translated back text
+    }
+  };
+
+  const handleBackBlur = async () => {
+    if (backText.trim() && targetLanguage && nativeLanguage) {
+      const translatedText = await translateText(
+        backText,
+        targetLanguage,
+        nativeLanguage
+      );
+      setFrontText(translatedText); // Set the translation for the front side
+      onSave(cardId, "textForward", translatedText); // Save the translated front text
+      onSave(cardId, "textBack", backText); // Save the back text
+    }
   };
 
   return (
@@ -111,12 +169,16 @@ function AddCardComp({
             ref={frontTextareaRef}
             value={frontText}
             onChange={(e) => setFrontText(e.target.value)}
-            onBlur={handleBlur}
+            onBlur={handleFrontBlur} // Trigger translation on blur
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
           <div
             ref={frontImageRef}
-            style={imageBoxStyle("front")}
+            style={{
+              backgroundImage: `url(${frontImageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
               activeSide === "front" ? "ring ring-primary" : ""
             }`}
@@ -128,7 +190,9 @@ function AddCardComp({
               }
             }}
           >
-            {renderImageBoxContent("front")}
+            {!frontImageUrl && (
+              <span className="text-gray-500 font-bold">IMAGE</span>
+            )}
           </div>
         </div>
 
@@ -141,12 +205,16 @@ function AddCardComp({
             ref={backTextareaRef}
             value={backText}
             onChange={(e) => setBackText(e.target.value)}
-            onBlur={handleBlur}
+            onBlur={handleBackBlur} // Trigger translation on blur
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
           <div
             ref={backImageRef}
-            style={imageBoxStyle("back")}
+            style={{
+              backgroundImage: `url(${backImageUrl})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
             className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
               activeSide === "back" ? "ring ring-primary" : ""
             }`}
@@ -158,7 +226,9 @@ function AddCardComp({
               }
             }}
           >
-            {renderImageBoxContent("back")}
+            {!backImageUrl && (
+              <span className="text-gray-500 font-bold">IMAGE</span>
+            )}
           </div>
         </div>
       </div>

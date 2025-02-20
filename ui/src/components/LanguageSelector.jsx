@@ -6,8 +6,6 @@ const LANGUAGES = [
   { code: "DE", name: "German" },
   { code: "EL", name: "Greek" },
   { code: "EN", name: "English" },
-  { code: "EN-GB", name: "English (British)" },
-  { code: "EN-US", name: "English (American)" },
   { code: "ES", name: "Spanish" },
   { code: "ET", name: "Estonian" },
   { code: "FI", name: "Finnish" },
@@ -23,8 +21,6 @@ const LANGUAGES = [
   { code: "NL", name: "Dutch" },
   { code: "PL", name: "Polish" },
   { code: "PT", name: "Portuguese" },
-  { code: "PT-BR", name: "Portuguese (Brazilian)" },
-  { code: "PT-PT", name: "Portuguese (European)" },
   { code: "RO", name: "Romanian" },
   { code: "RU", name: "Russian" },
   { code: "SK", name: "Slovak" },
@@ -33,24 +29,27 @@ const LANGUAGES = [
   { code: "TR", name: "Turkish" },
   { code: "UK", name: "Ukrainian" },
   { code: "ZH", name: "Chinese" },
-  { code: "ZH-HANS", name: "Chinese (Simplified)" },
-  { code: "ZH-HANT", name: "Chinese (Traditional)" },
 ];
 
 function LanguageSelector({ label, value, onChange }) {
   return (
-    <select
-      className="select w-40"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <div
+      className="tooltip"
+      data-tip="If languages are selected, we will auto-translate text for you :)"
     >
-      <option value="">{label}</option>
-      {LANGUAGES.map((lang) => (
-        <option key={lang.code} value={lang.code}>
-          {lang.name}
-        </option>
-      ))}
-    </select>
+      <select
+        className="select w-40"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        <option value="">{label}</option>
+        {LANGUAGES.map((lang) => (
+          <option key={lang.code} value={lang.code}>
+            {lang.name}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
