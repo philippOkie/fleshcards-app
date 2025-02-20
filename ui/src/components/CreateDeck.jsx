@@ -129,7 +129,7 @@ function CreateDeck() {
       const data = await response.json();
       setDeckCards((prevCards) => [...prevCards, data.card]);
 
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     } catch (error) {
       console.error("Error adding card:", error);
     }
@@ -218,7 +218,7 @@ function CreateDeck() {
 
   return (
     <div className="flex flex-col mt-24">
-      <div className="flex flex-col pl-48 pr-48 pb-24 gap-4 overflow-y-auto flex-1">
+      <div className="flex flex-col pl-48 pr-48 pb-64 gap-4 overflow-y-auto flex-1">
         {deckCards.length > 0 ? (
           deckCards.map((card, index) => (
             <AddCardComp
@@ -243,8 +243,6 @@ function CreateDeck() {
         )}
       </div>
 
-      <div ref={bottomRef}></div>
-
       <CreateDeckFooter
         deckName={deckTitle}
         setDeckName={handleTitleChange}
@@ -258,6 +256,8 @@ function CreateDeck() {
         nativeLanguage={nativeLanguage}
         setNativeLanguage={setNativeLanguage}
       />
+
+      <div ref={bottomRef}></div>
     </div>
   );
 }
