@@ -18,7 +18,13 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
 
     const deck = await prisma.deck.findUnique({
       where: { id: id },
-      include: { cards: true },
+      include: {
+        cards: {
+          orderBy: {
+            id: "asc",
+          },
+        },
+      },
     });
 
     if (!deck) {
