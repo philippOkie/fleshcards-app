@@ -32,7 +32,12 @@ router.get("/pictures", async (req, res) => {
     }
 
     const data = await response.json();
-    res.json(data);
+    const pictures = data.results.map((pic) => ({
+      id: pic.id,
+      urls: pic.urls.small,
+      alt_description: pic.alt_description || "Unsplash Image",
+    }));
+    res.json({ results: pictures });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -4,17 +4,14 @@ function PicturePicker({ side, query, onSelectImage }) {
   const [pictures, setPictures] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  // Use a ref to store the cached results by query string
   const cacheRef = useRef({});
 
   useEffect(() => {
-    // Only fetch if query exists and is non-empty
     if (!query || query.trim() === "") {
       setPictures([]);
       return;
     }
 
-    // If we have cached results for the query, use them
     if (cacheRef.current[query]) {
       setPictures(cacheRef.current[query]);
       return;
@@ -33,7 +30,6 @@ function PicturePicker({ side, query, onSelectImage }) {
         }
         const data = await response.json();
         const results = data.results || [];
-        // Save the results in the cache
         cacheRef.current[query] = results;
         setPictures(results);
       } catch (err) {
@@ -42,6 +38,7 @@ function PicturePicker({ side, query, onSelectImage }) {
         setIsLoading(false);
       }
     }
+
     fetchPictures();
   }, [query]);
 
@@ -56,17 +53,13 @@ function PicturePicker({ side, query, onSelectImage }) {
         <div
           key={pic.id}
           className="avatar cursor-pointer"
-          onClick={() => onSelectImage(side, pic.urls.small)}
+          onClick={() => onSelectImage(side, pic.urls)}
         >
           <div className="w-32 rounded">
-            <img
-              src={pic.urls.small}
-              alt={pic.alt_description || "Unsplash Image"}
-            />
+            <img src={pic.urls} alt={pic.alt_description} />
           </div>
         </div>
       ))}
-      {/* Optionally, an add new picture button */}
       <div className="w-32 h-32 rounded-full cursor-pointer flex items-center justify-center text-4xl font-bold text-gray-600">
         +
       </div>
