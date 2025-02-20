@@ -19,21 +19,24 @@ function PicturePicker({ side, query, onSelectImage }) {
 
     async function fetchPictures() {
       setIsLoading(true);
+
       try {
         const response = await fetch(
           `http://localhost:3000/api/cards/pictures?query=${encodeURIComponent(
             query
           )}&page=1&per_page=7`
         );
+
         if (!response.ok) {
           throw new Error("Failed to fetch pictures");
         }
-        const data = await response.json();
-        const results = data.results || [];
+
+        const { results } = await response.json();
+
         cacheRef.current[query] = results;
         setPictures(results);
-      } catch (err) {
-        setError(err.message);
+      } catch (error) {
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
