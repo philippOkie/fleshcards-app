@@ -24,7 +24,10 @@ function CreateDeckFooter({
   );
 
   useEffect(() => {
-    setIsSaveEnabled(cards.length > 0);
+    const allCardsFilled = cards.every(
+      (card) => card.textForward.trim() !== "" && card.textBack.trim() !== ""
+    );
+    setIsSaveEnabled(cards.length > 0 && allCardsFilled);
   }, [cards]);
 
   useEffect(() => {
@@ -124,7 +127,6 @@ function CreateDeckFooter({
           value={targetLanguage}
           onChange={(value) => {
             setTargetLanguage(value);
-            updateDeck("targetLanguage", value);
           }}
         />
 
@@ -133,7 +135,6 @@ function CreateDeckFooter({
           value={nativeLanguage}
           onChange={(value) => {
             setNativeLanguage(value);
-            updateDeck("nativeLanguage", value);
           }}
         />
       </div>

@@ -103,8 +103,8 @@ function CreateDeck() {
 
     const newCard = {
       deckId: unfinishedDeck.id,
-      textForward: "Type your text here! (Front side)",
-      textBack: "Type your text here! (Back side)",
+      textForward: "",
+      textBack: "",
     };
 
     try {
@@ -223,6 +223,8 @@ function CreateDeck() {
               onDelete={() => deleteCard(card.id)}
               number={index + 1}
               onSave={handleSaveCardText}
+              initialImageUrlForward={card.imageUrlForward}
+              initialImageUrlBack={card.imageUrlBack}
             />
           ))
         ) : (

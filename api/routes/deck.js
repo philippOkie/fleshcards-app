@@ -158,18 +158,13 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
 });
 
 router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
-  const user = req.user.id;
+  const userId = req.user.id;
   const { deckId } = req.params;
 
   try {
-    const deck = await prisma.deck.findFirst({
-      where: {
-        id: deckId,
-        userId: user.id,
-      },
-      include: {
-        cards: true,
-      },
+    const deck = await prisma.deck.findUnique({
+      where: { id: deckId, userId },
+      include: { cards: true },
     });
 
     if (!deck) {
@@ -182,6 +177,15 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
       return res.status(400).json({
         message: "You must add at least one card to finish the deck.",
       });
+    }
+
+    const hasEmptyCard = deck.cards.some(
+      (card) => !card.text || card.text.trim() === ""
+    );
+    if (hasEmptyCard) {
+      return res
+        .status(400)
+        .json({ message: "All cards must have non-empty text." });
     }
 
     const updatedDeck = await prisma.deck.update({

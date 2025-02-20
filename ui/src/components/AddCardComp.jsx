@@ -3,31 +3,42 @@ import { useState, useRef, useEffect } from "react";
 import PicturePicker from "./PicturePicker";
 
 function AddCardComp({
-  initialFrontText,
-  initialBackText,
+  initialFrontText = "",
+  initialBackText = "",
   onDelete,
   number,
   cardId,
   onSave,
+  initialImageUrlForward = "",
+  initialImageUrlBack = "",
 }) {
-  const [frontText, setFrontText] = useState(initialFrontText || "");
-  const [backText, setBackText] = useState(initialBackText || "");
+  const [frontText, setFrontText] = useState(initialFrontText);
+  const [backText, setBackText] = useState(initialBackText);
+  const [frontImageUrl, setFrontImageUrl] = useState(initialImageUrlForward);
+  const [backImageUrl, setBackImageUrl] = useState(initialImageUrlBack);
   const [showPicturePicker, setShowPicturePicker] = useState(false);
   const [activeSide, setActiveSide] = useState(null);
+
   const frontTextareaRef = useRef(null);
   const backTextareaRef = useRef(null);
+  const frontImageRef = useRef(null);
+  const backImageRef = useRef(null);
 
-  const autoResizeTextarea = (textareaRef) => {
-    if (textareaRef.current) {
+  const autoResizeTextarea = (textareaRef, imageRef) => {
+    if (textareaRef.current && imageRef.current) {
+      const imageHeight = imageRef.current.clientHeight;
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.max(
+        textareaRef.current.scrollHeight,
+        imageHeight
+      )}px`;
     }
   };
 
   useEffect(() => {
-    autoResizeTextarea(frontTextareaRef);
-    autoResizeTextarea(backTextareaRef);
-  }, [frontText, backText]);
+    autoResizeTextarea(frontTextareaRef, frontImageRef);
+    autoResizeTextarea(backTextareaRef, backImageRef);
+  }, [frontText, backText, frontImageUrl, backImageUrl]);
 
   const handleBlur = () => {
     if (onSave) {
@@ -37,10 +48,48 @@ function AddCardComp({
   };
 
   const handleImageButtonClick = (side) => {
-    setActiveSide((prevState) => (prevState === side ? null : side));
-    setShowPicturePicker((prevState) =>
-      prevState && activeSide === side ? false : true
-    );
+    setActiveSide((prev) => (prev === side ? null : side));
+    setShowPicturePicker((prev) => activeSide !== side);
+  };
+
+  const handleSelectImage = async (side, imageUrl) => {
+    const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
+    try {
+      await onSave(cardId, field, imageUrl);
+      side === "front" ? setFrontImageUrl(imageUrl) : setBackImageUrl(imageUrl);
+    } catch (error) {
+      console.error("Error saving image:", error);
+    }
+    setShowPicturePicker(false);
+    setActiveSide(null);
+  };
+
+  const handleRemoveImage = (side) => {
+    const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
+    onSave(cardId, field, "");
+    if (side === "front") {
+      setFrontImageUrl("");
+    } else {
+      setBackImageUrl("");
+    }
+  };
+
+  const imageBoxStyle = (side) => {
+    const imageUrl = side === "front" ? frontImageUrl : backImageUrl;
+    return imageUrl
+      ? {
+          backgroundImage: `url(${imageUrl})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }
+      : { backgroundColor: "transparent" };
+  };
+
+  const renderImageBoxContent = (side) => {
+    const imageUrl = side === "front" ? frontImageUrl : backImageUrl;
+
+    if (!imageUrl)
+      return <span className="text-gray-500 font-bold">IMAGE</span>;
   };
 
   return (
@@ -51,7 +100,6 @@ function AddCardComp({
             {number}
           </span>
         )}
-
         <button onClick={onDelete} className="absolute top-2 left-4">
           &times;
         </button>
@@ -66,15 +114,22 @@ function AddCardComp({
             onBlur={handleBlur}
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
-
-          <button
-            className={`btn btn-xs sm:btn-sm md:btn-md lg:btn-lg ${
-              activeSide === "front" ? "btn-active" : "btn-ghost"
+          <div
+            ref={frontImageRef}
+            style={imageBoxStyle("front")}
+            className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
+              activeSide === "front" ? "ring ring-primary" : ""
             }`}
-            onClick={() => handleImageButtonClick("front")}
+            onClick={() => {
+              if (frontImageUrl) {
+                handleRemoveImage("front");
+              } else {
+                handleImageButtonClick("front");
+              }
+            }}
           >
-            IMAGE
-          </button>
+            {renderImageBoxContent("front")}
+          </div>
         </div>
 
         <div className="divider divider-horizontal"></div>
@@ -89,19 +144,32 @@ function AddCardComp({
             onBlur={handleBlur}
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
-
-          <button
-            className={`btn btn-xs sm:btn-sm md:btn-md lg:btn-lg ${
-              activeSide === "back" ? "btn-active" : "btn-ghost"
+          <div
+            ref={backImageRef}
+            style={imageBoxStyle("back")}
+            className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
+              activeSide === "back" ? "ring ring-primary" : ""
             }`}
-            onClick={() => handleImageButtonClick("back")}
+            onClick={() => {
+              if (backImageUrl) {
+                handleRemoveImage("back");
+              } else {
+                handleImageButtonClick("back");
+              }
+            }}
           >
-            IMAGE
-          </button>
+            {renderImageBoxContent("back")}
+          </div>
         </div>
       </div>
 
-      {showPicturePicker && <PicturePicker side={activeSide} />}
+      {showPicturePicker && (
+        <PicturePicker
+          side={activeSide}
+          query={frontText}
+          onSelectImage={handleSelectImage}
+        />
+      )}
     </>
   );
 }
