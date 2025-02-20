@@ -43,7 +43,7 @@ router.get("/pictures", verifyToken, async (req, res) => {
 });
 
 router.post("/translate", verifyToken, async (req, res) => {
-  const { text, targetLanguage } = req.body;
+  const { text, sourceLanguage, targetLanguage } = req.body;
 
   if (!text || !targetLanguage) {
     return res
@@ -52,21 +52,39 @@ router.post("/translate", verifyToken, async (req, res) => {
   }
 
   try {
-    const response = await axios.post(
-      "https://api-free.deepl.com/v2/translate",
-      null,
-      {
-        params: {
-          auth_key: process.env.DEEPL_KEY,
-          text: text,
-          target_lang: targetLanguage.toUpperCase(),
-        },
-      }
-    );
-    res.json(response.data);
+    const params = new URLSearchParams({
+      auth_key: process.env.DEEPL_KEY,
+      text: text,
+      target_lang: targetLanguage.toUpperCase(),
+    });
+
+    if (sourceLanguage) {
+      params.append("source_lang", sourceLanguage.toUpperCase());
+    }
+
+    const response = await fetch("https://api-free.deepl.com/v2/translate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
+
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(
+        `HTTP error! Status: ${response.status}, Details: ${errorDetails}`
+      );
+    }
+
+    const data = await response.json();
+    res.json(data);
   } catch (error) {
-    console.error("Error translating text:", error);
-    res.status(500).json({ message: "Translation failed. Please try again." });
+    console.error("Error translating text:", error.message);
+    res.status(500).json({
+      message: "Translation failed. Please try again.",
+      error: error.message,
+    });
   }
 });
 
