@@ -157,7 +157,6 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
 
   const unfinishedDeck = await prisma.deck.findFirst({
     where: { userId: user.id, finished: false },
-    include: { cards: true },
   });
 
   res.json(unfinishedDeck);
