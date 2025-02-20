@@ -1,12 +1,12 @@
-import express from "express";
+import { Router } from "express";
+const router = Router();
+
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { generateToken } from "../utils/auth.js";
 
-const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from "../utils/prismaClient.js";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

@@ -1,10 +1,9 @@
-import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { Router } from "express";
+const router = Router();
 
 import { verifyToken } from "../utils/auth.js";
 
-const router = express.Router();
-const prisma = new PrismaClient();
+import prisma from "../utils/prismaClient.js";
 
 router.post("/create", verifyToken, async (req, res) => {
   try {

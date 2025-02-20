@@ -1,8 +1,9 @@
-import express from "express";
+import { Router } from "express";
+const router = Router();
 
 import { verifyToken } from "../utils/auth.js";
 
-const router = express.Router();
+import prisma from "../utils/prismaClient.js";
 
 router.get("/pictures", verifyToken, async (req, res) => {
   const query = req.query.query && req.query.query.trim();

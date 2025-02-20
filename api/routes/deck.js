@@ -1,11 +1,10 @@
-import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { Router } from "express";
+const router = Router();
+
+import prisma from "../utils/prismaClient.js";
 import { v4 as uuidv4 } from "uuid";
 
 import { verifyToken } from "../utils/auth.js";
-
-const router = express.Router();
-const prisma = new PrismaClient();
 
 router.get("/deck/:id", verifyToken, async (req, res) => {
   try {
