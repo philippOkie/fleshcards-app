@@ -5,6 +5,8 @@ import { verifyToken } from "../utils/auth.js";
 
 import prisma from "../utils/prismaClient.js";
 
+import { sm2Algorithm } from "../utils/sm2Algorithm.js";
+
 router.post("/create", verifyToken, async (req, res) => {
   try {
     const user = req.user.id;
@@ -132,6 +134,42 @@ router.delete("/delete", verifyToken, async (req, res) => {
     res.json({
       message: "Card deleted successfully!",
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put("/rate/:cardId", verifyToken, async (req, res) => {
+  try {
+    const user = req.user.id;
+    const cardId = parseInt(req.params.cardId);
+    const { rating } = req.body;
+    if (!rating) {
+      return res.status(400).json({ error: "Rating is required" });
+    }
+
+    const card = await prisma.card.findUnique({
+      where: { id: cardId },
+      include: { deck: true },
+    });
+
+    if (!card) return res.status(404).json({ error: "Card not found" });
+    if (card.deck.userId !== user.id)
+      return res.status(403).json({ error: "Not authorized" });
+
+    const updatedParams = sm2Algorithm(card, rating);
+
+    const updatedCard = await prisma.card.update({
+      where: { id: cardId },
+      data: {
+        easeFactor: parseFloat(updatedParams.easiness),
+        interval: updatedParams.interval,
+        repetitions: updatedParams.repetitions,
+        reviewDate: updatedParams.reviewDate,
+      },
+    });
+
+    res.json({ message: "Card rated successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

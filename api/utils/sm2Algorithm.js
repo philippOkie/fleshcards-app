@@ -1,5 +1,5 @@
-function sm2Algorithm(card, rating) {
-  let { easiness, interval, repetitions } = card;
+export function sm2Algorithm(card, rating) {
+  let { easeFactor: easiness, interval, repetitions } = card;
 
   // Map 4-button rating to SM-2 quality scale
   const qualityMap = { 1: 0, 2: 2, 3: 3, 4: 5 };
