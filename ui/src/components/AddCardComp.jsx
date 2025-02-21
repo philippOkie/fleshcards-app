@@ -18,17 +18,15 @@ function AddCardComp({
   const [backText, setBackText] = useState(initialBackText);
   const [frontImageUrl, setFrontImageUrl] = useState(initialImageUrlForward);
   const [backImageUrl, setBackImageUrl] = useState(initialImageUrlBack);
-  const [showPicturePicker, setShowPicturePicker] = useState(false);
-  const [activeSide, setActiveSide] = useState(null);
+  const [isPicturePickerVisible, setIsPicturePickerVisible] = useState(false);
+  const [selectedSide, setSelectedSide] = useState(null);
 
   const frontTextareaRef = useRef(null);
   const backTextareaRef = useRef(null);
   const frontImageRef = useRef(null);
   const backImageRef = useRef(null);
 
-  const authToken = localStorage.getItem("token");
-
-  const autoResizeTextarea = (textareaRef, imageRef) => {
+  const resizeTextarea = (textareaRef, imageRef) => {
     if (textareaRef.current && imageRef.current) {
       const imageHeight = imageRef.current.clientHeight;
       textareaRef.current.style.height = "auto";
@@ -40,23 +38,16 @@ function AddCardComp({
   };
 
   useEffect(() => {
-    autoResizeTextarea(frontTextareaRef, frontImageRef);
-    autoResizeTextarea(backTextareaRef, backImageRef);
+    resizeTextarea(frontTextareaRef, frontImageRef);
+    resizeTextarea(backTextareaRef, backImageRef);
   }, [frontText, backText, frontImageUrl, backImageUrl]);
 
-  const handleBlur = () => {
-    if (onSave) {
-      onSave(cardId, "textForward", frontText);
-      onSave(cardId, "textBack", backText);
-    }
+  const handleImageToggle = (side) => {
+    setSelectedSide((prev) => (prev === side ? null : side));
+    setIsPicturePickerVisible((prev) => selectedSide !== side);
   };
 
-  const handleImageButtonClick = (side) => {
-    setActiveSide((prev) => (prev === side ? null : side));
-    setShowPicturePicker((prev) => activeSide !== side);
-  };
-
-  const handleSelectImage = async (side, imageUrl) => {
+  const handleImageSelect = async (side, imageUrl) => {
     const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
     try {
       await onSave(cardId, field, imageUrl);
@@ -64,35 +55,14 @@ function AddCardComp({
     } catch (error) {
       console.error("Error saving image:", error);
     }
-    setShowPicturePicker(false);
-    setActiveSide(null);
+    setIsPicturePickerVisible(false);
+    setSelectedSide(null);
   };
 
-  const handleRemoveImage = (side) => {
+  const handleImageRemove = (side) => {
     const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
     onSave(cardId, field, "");
-    if (side === "front") {
-      setFrontImageUrl("");
-    } else {
-      setBackImageUrl("");
-    }
-  };
-
-  const imageBoxStyle = (side) => {
-    const imageUrl = side === "front" ? frontImageUrl : backImageUrl;
-    return imageUrl
-      ? {
-          backgroundImage: `url(${imageUrl})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }
-      : { backgroundColor: "transparent" };
-  };
-
-  const renderImageBoxContent = (side) => {
-    const imageUrl = side === "front" ? frontImageUrl : backImageUrl;
-    if (!imageUrl)
-      return <span className="text-gray-500 font-bold">IMAGE</span>;
+    side === "front" ? setFrontImageUrl("") : setBackImageUrl("");
   };
 
   const translateText = async (text, sourceLang, targetLang) => {
@@ -108,7 +78,7 @@ function AddCardComp({
           },
           body: JSON.stringify({
             text,
-            sourceLanguage: sourceLang || "", // Ensure this is passed as empty if not set
+            sourceLanguage: sourceLang || "",
             targetLanguage: targetLang,
           }),
         }
@@ -117,36 +87,46 @@ function AddCardComp({
       if (!response.ok) throw new Error("Translation failed");
 
       const data = await response.json();
-      return data.translations[0].text; // Assuming the API returns { translations: [{ text: "translated text" }] }
+      return data.translations[0].text;
     } catch (error) {
       console.error("Translation error:", error);
       return "";
     }
   };
 
-  const handleFrontBlur = async () => {
-    if (frontText.trim() && targetLanguage && nativeLanguage) {
+  const handleFrontTextBlur = async () => {
+    if (
+      !backText.trim() &&
+      frontText.trim() &&
+      targetLanguage &&
+      nativeLanguage
+    ) {
       const translatedText = await translateText(
         frontText,
         nativeLanguage,
         targetLanguage
       );
-      setBackText(translatedText); // Set the translation for the back side
-      onSave(cardId, "textForward", frontText); // Save the front text
-      onSave(cardId, "textBack", translatedText); // Save the translated back text
+      setBackText(translatedText);
+      onSave(cardId, "textForward", frontText);
+      onSave(cardId, "textBack", translatedText);
     }
   };
 
-  const handleBackBlur = async () => {
-    if (backText.trim() && targetLanguage && nativeLanguage) {
+  const handleBackTextBlur = async () => {
+    if (
+      !frontText.trim() &&
+      backText.trim() &&
+      targetLanguage &&
+      nativeLanguage
+    ) {
       const translatedText = await translateText(
         backText,
         targetLanguage,
         nativeLanguage
       );
-      setFrontText(translatedText); // Set the translation for the front side
-      onSave(cardId, "textForward", translatedText); // Save the translated front text
-      onSave(cardId, "textBack", backText); // Save the back text
+      setFrontText(translatedText);
+      onSave(cardId, "textForward", translatedText);
+      onSave(cardId, "textBack", backText);
     }
   };
 
@@ -169,7 +149,7 @@ function AddCardComp({
             ref={frontTextareaRef}
             value={frontText}
             onChange={(e) => setFrontText(e.target.value)}
-            onBlur={handleFrontBlur} // Trigger translation on blur
+            onBlur={handleFrontTextBlur}
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
           <div
@@ -180,14 +160,12 @@ function AddCardComp({
               backgroundPosition: "center",
             }}
             className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
-              activeSide === "front" ? "ring ring-primary" : ""
+              selectedSide === "front" ? "ring ring-primary" : ""
             }`}
             onClick={() => {
-              if (frontImageUrl) {
-                handleRemoveImage("front");
-              } else {
-                handleImageButtonClick("front");
-              }
+              frontImageUrl
+                ? handleImageRemove("front")
+                : handleImageToggle("front");
             }}
           >
             {!frontImageUrl && (
@@ -205,7 +183,7 @@ function AddCardComp({
             ref={backTextareaRef}
             value={backText}
             onChange={(e) => setBackText(e.target.value)}
-            onBlur={handleBackBlur} // Trigger translation on blur
+            onBlur={handleBackTextBlur}
             style={{ minHeight: "40px", fontSize: "16px" }}
           />
           <div
@@ -216,14 +194,12 @@ function AddCardComp({
               backgroundPosition: "center",
             }}
             className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
-              activeSide === "back" ? "ring ring-primary" : ""
+              selectedSide === "back" ? "ring ring-primary" : ""
             }`}
             onClick={() => {
-              if (backImageUrl) {
-                handleRemoveImage("back");
-              } else {
-                handleImageButtonClick("back");
-              }
+              backImageUrl
+                ? handleImageRemove("back")
+                : handleImageToggle("back");
             }}
           >
             {!backImageUrl && (
@@ -233,11 +209,11 @@ function AddCardComp({
         </div>
       </div>
 
-      {showPicturePicker && (
+      {isPicturePickerVisible && (
         <PicturePicker
-          side={activeSide}
+          side={selectedSide}
           query={frontText}
-          onSelectImage={handleSelectImage}
+          onSelectImage={handleImageSelect}
         />
       )}
     </>
