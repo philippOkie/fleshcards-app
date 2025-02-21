@@ -79,6 +79,30 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
 
   const currentCard = cards[currentIndex];
 
+  const handleRateCard = async (rating) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:3000/api/cards/rate/${currentCard.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rating }),
+        }
+      );
+      if (response.ok) {
+        handleNextCard();
+      } else {
+        console.error("Error rating card:", response.status);
+      }
+    } catch (error) {
+      console.error("Error rating card:", error);
+    }
+  };
+
   const handleNextCard = () => {
     if (currentIndex < cards.length - 1) {
       setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -102,7 +126,7 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
 
             <div className="flex justify-center mt-10">
               {showAnswerBtnClicked ? (
-                <CardRateBtns onNext={handleNextCard} />
+                <CardRateBtns onRate={handleRateCard} />
               ) : (
                 <ShowAnswerBtn
                   onShowAnswerBtnClick={handleShowAnswerBtnClick}
