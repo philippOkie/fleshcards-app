@@ -104,7 +104,7 @@ router.put("/update/:deckId", verifyToken, async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating deck");
-    res.status(500).json({ "Failed to update deck" });
+    res.status(500).json({ error: "Failed to update deck" });
   }
 });
 
