@@ -11,9 +11,7 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
     const { id } = req.params;
     const user = req.user.id;
 
-    if (!user) {
-      return res.status(400).json({ message: "user is required" });
-    }
+    if (!user) return res.status(400).json({ message: "user is required" });
 
     const deck = await prisma.deck.findUnique({
       where: { id: id },
@@ -26,9 +24,7 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
       },
     });
 
-    if (!deck) {
-      return res.status(404).json({ message: "Deck not found" });
-    }
+    if (!deck) return res.status(404).json({ message: "Deck not found" });
 
     if (deck.userId !== user.id) {
       return res
@@ -36,11 +32,17 @@ router.get("/deck/:id", verifyToken, async (req, res) => {
         .json({ message: "You do not have permission to view this deck" });
     }
 
+    const dueCards = deck.cards.filter((card) => {
+      return !card.reviewDate || new Date(card.reviewDate) <= new Date();
+    });
+
     const { userId: removedUserId, ...deckWithoutUserId } = deck;
+    deckWithoutUserId.cards = dueCards;
 
     res.json(deckWithoutUserId);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching deck");
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -49,18 +51,14 @@ router.delete("/deck/:id", verifyToken, async (req, res) => {
     const { id } = req.params;
     const user = req.user.id;
 
-    if (!user) {
-      return res.status(400).json({ message: "User is required" });
-    }
+    if (!user) return res.status(400).json({ message: "User is required" });
 
     const deck = await prisma.deck.findUnique({
       where: { id },
       include: { cards: true },
     });
 
-    if (!deck) {
-      return res.status(404).json({ message: "Deck not found" });
-    }
+    if (!deck) return res.status(404).json({ message: "Deck not found" });
 
     if (deck.userId !== user) {
       return res
@@ -68,13 +66,8 @@ router.delete("/deck/:id", verifyToken, async (req, res) => {
         .json({ message: "You do not have permission to delete this deck" });
     }
 
-    await prisma.card.deleteMany({
-      where: { deckId: id },
-    });
-
-    await prisma.deck.delete({
-      where: { id },
-    });
+    await prisma.card.deleteMany({ where: { deckId: id } });
+    await prisma.deck.delete({ where: { id } });
 
     res.json({ message: "Deck deleted successfully" });
   } catch (error) {
@@ -110,10 +103,8 @@ router.put("/update/:deckId", verifyToken, async (req, res) => {
       updatedDeckId: updatedDeck.id,
     });
   } catch (error) {
-    console.error("Error updating deck:", error);
-    res.status(500).json({
-      error: error.message || "Failed to update deck",
-    });
+    console.error("Error updating deck");
+    res.status(500).json({ "Failed to update deck" });
   }
 });
 
@@ -162,10 +153,10 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
 });
 
 router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
-  const userId = req.user.id;
-  const { deckId } = req.params;
-
   try {
+    const userId = req.user.id;
+    const { deckId } = req.params;
+
     const deck = await prisma.deck.findUnique({
       where: { id: deckId, userId },
       include: { cards: true },
@@ -199,7 +190,7 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
 
     res.json(updatedDeck);
   } catch (error) {
-    console.error("Error updating deck:", error);
+    console.error("Error updating deck");
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -207,14 +198,28 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
 router.get("/all", verifyToken, async (req, res) => {
   try {
     const user = req.user.id;
+    const now = new Date();
 
     const decks = await prisma.deck.findMany({
-      where: { userId: user.id, finished: true },
+      where: {
+        userId: user.id,
+        finished: true,
+        cards: {
+          some: {
+            reviewDate: {
+              lte: now,
+            },
+          },
+        },
+      },
     });
 
     res.json(decks);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch decks" });
+    console.error("Error fetching decks:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch decks", details: error.message });
   }
 });
 

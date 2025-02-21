@@ -44,9 +44,7 @@ router.post("/register", async (req, res) => {
       },
     });
 
-    res
-      .status(201)
-      .json({ message: "User created successfully", userId: user.id });
+    res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
@@ -63,9 +61,8 @@ router.post("/login", async (req, res) => {
       },
     });
 
-    if (!user) {
+    if (!user)
       return res.status(401).json({ error: "Invalid login or password" });
-    }
 
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
@@ -80,7 +77,6 @@ router.post("/login", async (req, res) => {
       user: { id: user.id, login: user.login, email: user.email },
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
