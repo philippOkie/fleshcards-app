@@ -6,15 +6,53 @@ import { verifyToken } from "../utils/auth.js";
 import prisma from "../utils/prismaClient.js";
 
 router.get("/pictures", verifyToken, async (req, res) => {
-  const query = req.query.query && req.query.query.trim();
+  let query = req.query.query && req.query.query.trim();
   if (!query) {
     return res.status(400).json({ error: "Query parameter is required" });
   }
+
   const page = req.query.page || 1;
   const per_page = req.query.per_page || 7;
   const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
+  const isEnglish = /^[a-zA-Z0-9\s.,!?'"-]+$/.test(query);
+
   try {
+    if (!isEnglish) {
+      const params = new URLSearchParams({
+        auth_key: process.env.DEEPL_KEY,
+        text: query,
+        target_lang: "EN",
+      });
+
+      const translateResponse = await fetch(
+        "https://api-free.deepl.com/v2/translate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        }
+      );
+
+      if (!translateResponse.ok) {
+        const errorDetails = await translateResponse.text();
+        throw new Error(
+          `Translation error! Status: ${translateResponse.status}, Details: ${errorDetails}`
+        );
+      }
+
+      const translationData = await translateResponse.json();
+      if (
+        translationData.translations &&
+        translationData.translations.length > 0
+      ) {
+        query = translationData.translations[0].text;
+        console.log(`Translated query from non-English to: "${query}"`);
+      }
+    }
+
     const response = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
         query
@@ -35,9 +73,16 @@ router.get("/pictures", verifyToken, async (req, res) => {
       id: pic.id,
       urls: pic.urls.small,
       alt_description: pic.alt_description || "Image",
+      original_query: req.query.query.trim(),
+      translated_query: isEnglish ? null : query,
     }));
-    res.json({ results: pictures });
+
+    res.json({
+      results: pictures,
+      translated: !isEnglish,
+    });
   } catch (error) {
+    console.error("Error in picture search:", error.message);
     res.status(500).json({ error: error.message });
   }
 });
