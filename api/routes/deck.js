@@ -154,11 +154,11 @@ router.get("/get-unfinished-deck", verifyToken, async (req, res) => {
 
 router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const user = req.user.id;
     const { deckId } = req.params;
 
     const deck = await prisma.deck.findUnique({
-      where: { id: deckId, userId },
+      where: { id: deckId, userId: user.id },
       include: { cards: true },
     });
 
@@ -169,15 +169,24 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
     }
 
     if (deck.cards.length === 0) {
+      console.log("Deck has no cards:", deck); // Log the deck
       return res.status(400).json({
         message: "You must add at least one card to finish the deck.",
       });
     }
 
+    // Log the cards for debugging
+    console.log("Cards in the deck:", deck.cards);
+
     const hasEmptyCard = deck.cards.some(
-      (card) => !card.text || card.text.trim() === ""
+      (card) =>
+        !card.textForward ||
+        card.textForward.trim() === "" ||
+        !card.textBack ||
+        card.textBack.trim() === ""
     );
     if (hasEmptyCard) {
+      console.log("Deck has empty cards:", deck.cards); // Log the cards
       return res
         .status(400)
         .json({ message: "All cards must have non-empty text." });
@@ -188,10 +197,13 @@ router.put("/set-finished-deck/:deckId", verifyToken, async (req, res) => {
       data: { finished: true },
     });
 
+    console.log("Updated deck:", updatedDeck); // Log the updated deck
     res.json(updatedDeck);
   } catch (error) {
-    console.error("Error updating deck");
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error updating deck:", error); // Log the full error
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", details: error.message });
   }
 });
 
