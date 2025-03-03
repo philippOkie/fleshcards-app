@@ -96,8 +96,8 @@ function AddCardComp({
 
   const handleFrontTextBlur = async () => {
     if (
-      !backText.trim() &&
-      frontText.trim() &&
+      !(backText || "").trim() && // Check for null or undefined before calling trim
+      (frontText || "").trim() && // Ensure frontText isn't null or undefined
       targetLanguage &&
       nativeLanguage
     ) {
@@ -114,8 +114,8 @@ function AddCardComp({
 
   const handleBackTextBlur = async () => {
     if (
-      !frontText.trim() &&
-      backText.trim() &&
+      !(frontText || "").trim() && // Check for null or undefined before calling trim
+      (backText || "").trim() && // Ensure backText isn't null or undefined
       targetLanguage &&
       nativeLanguage
     ) {

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import LanguageSelector from "./LanguageSelector";
 
 function CreateDeckFooter({
@@ -32,7 +31,9 @@ function CreateDeckFooter({
 
   useEffect(() => {
     const allCardsFilled = cards.every(
-      (card) => card.textForward.trim() !== "" && card.textBack.trim() !== ""
+      (card) =>
+        (card.textForward || "").trim() !== "" &&
+        (card.textBack || "").trim() !== ""
     );
     setIsSaveEnabled(cards.length > 0 && allCardsFilled);
   }, [cards]);
