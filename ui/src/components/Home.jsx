@@ -159,7 +159,7 @@ function Home({
       <div className="flex flex-col pr-32 justify-center items-center w-full">
         {" "}
         {isLoading ? (
-          <div className="skeleton h-[500px] w-full bg-base-200 animate-pulse rounded-box"></div>
+          <div className="skeleton h-[500px] w-full bg-transparent animate-pulse rounded-box"></div>
         ) : deckCompleted ? (
           <div className="text-center animate-fade-in">
             <div className="text-9xl mb-8">🎉</div>
@@ -196,7 +196,7 @@ function Home({
           <div className="card bg-transparent text-neutral-content w-290 p-4">
             <div className="flex w-full flex-col border-opacity-50">
               <div className="card bg-base-100 rounded-box grid h-80 place-items-center text-5xl">
-                Please, choose a deck to start!
+                Choose or create a deck to get started!
               </div>
               <div className="divider"></div>
               <div className="card rounded-box grid h-80 place-items-center text-5xl"></div>

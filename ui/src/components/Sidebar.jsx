@@ -34,7 +34,7 @@ function Sidebar({
             </button>
           ))
         ) : (
-          <p className="text-center">No decks found</p>
+          <p className="text-center">No decks are due for review.</p>
         )}
       </div>
     </div>
