@@ -74,11 +74,10 @@ function LoginPage({ onLogin }) {
 
   return (
     <div className="h-screen bg-base-200 flex flex-col overflow-hidden">
-      {/* Navbar */}
       <div className="navbar-start flex gap-2 items-center mb-2 mt-2 pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
       </div>
-      {/* Main Content */}
+
       <div className="flex flex-grow items-center justify-center px-4">
         <div className="card w-full max-w-md bg-base-100 shadow-xl">
           <div className="card-body">
@@ -105,13 +104,13 @@ function LoginPage({ onLogin }) {
               </div>
             )}
             <div className="form-control">
-              <label className="label">
+              <label className="label mb-2">
                 <span className="label-text">Email / Username</span>
               </label>
               <input
                 type="text"
                 placeholder="Enter your email or username"
-                className="input input-bordered"
+                className="input input-bordered w-full"
                 value={emailOrLogin}
                 onChange={handleEmailOrLoginChange}
                 onKeyDown={handleKeyDown}
@@ -119,14 +118,14 @@ function LoginPage({ onLogin }) {
               />
             </div>
             <div className="form-control mt-4">
-              <label className="label">
+              <label className="label mb-2">
                 <span className="label-text">Password</span>
                 <a>(Friendly advice: don't use your old passwords)</a>
               </label>
               <input
                 type="password"
                 placeholder="Enter your password"
-                className="input input-bordered"
+                className="input input-bordered  w-full"
                 value={password}
                 onChange={handlePasswordChange}
                 onKeyDown={handleKeyDown}
@@ -134,7 +133,9 @@ function LoginPage({ onLogin }) {
             </div>
             <div className="form-control mt-6">
               <button
-                className={`btn btn-primary ${isLoading ? "loading" : ""}`}
+                className={`btn btn-primary w-full ${
+                  isLoading ? "loading" : ""
+                }`}
                 onClick={handleLoginBtnClick}
                 disabled={isLoading}
               >
