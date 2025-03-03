@@ -25,12 +25,28 @@ router.post("/create", verifyToken, async (req, res) => {
         .json({ error: "Deck not found or does not belong to the user." });
     }
 
-    const maxCard = await prisma.card.findFirst({
-      where: { deckId: deckId },
+    let nextCardId = 1;
+    const existingCard = await prisma.card.findFirst({
+      where: { deckId },
       orderBy: { id: "desc" },
     });
 
-    const nextCardId = maxCard ? maxCard.id + 1 : 1;
+    if (existingCard) {
+      nextCardId = existingCard.id + 1;
+    }
+
+    let cardExists = true;
+    while (cardExists) {
+      const cardWithSameId = await prisma.card.findUnique({
+        where: { id: nextCardId },
+      });
+
+      if (cardWithSameId) {
+        nextCardId++;
+      } else {
+        cardExists = false;
+      }
+    }
 
     const card = await prisma.card.create({
       data: {
