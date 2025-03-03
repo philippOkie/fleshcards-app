@@ -141,10 +141,8 @@ function Home({
           <div key={`card-${currentIndex}`}>
             <Card
               showAnswerBtnClicked={showAnswerBtnClicked}
-              props={{
-                forwardText: currentCard.textForward,
-                backText: currentCard.textBack,
-              }}
+              forwardText={currentCard.textForward}
+              backText={currentCard.textBack}
             />
 
             <div className="flex justify-center mt-10">
