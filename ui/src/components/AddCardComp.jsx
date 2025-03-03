@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from "react";
-
+import { useState, useRef, useEffect, useCallback } from "react";
 import PicturePicker from "./PicturePicker";
 
 function AddCardComp({
@@ -14,19 +13,35 @@ function AddCardComp({
   targetLanguage,
   nativeLanguage,
 }) {
-  const [frontText, setFrontText] = useState(initialFrontText);
-  const [backText, setBackText] = useState(initialBackText);
-  const [frontImageUrl, setFrontImageUrl] = useState(initialImageUrlForward);
-  const [backImageUrl, setBackImageUrl] = useState(initialImageUrlBack);
-  const [isPicturePickerVisible, setIsPicturePickerVisible] = useState(false);
-  const [selectedSide, setSelectedSide] = useState(null);
+  const [cardState, setCardState] = useState({
+    frontText: initialFrontText,
+    backText: initialBackText,
+    frontImageUrl: initialImageUrlForward,
+    backImageUrl: initialImageUrlBack,
+  });
 
-  const frontTextareaRef = useRef(null);
-  const backTextareaRef = useRef(null);
-  const frontImageRef = useRef(null);
-  const backImageRef = useRef(null);
+  const [pickerState, setPickerState] = useState({
+    isVisible: false,
+    selectedSide: null,
+  });
 
-  const resizeTextarea = (textareaRef, imageRef) => {
+  const textareaRefs = {
+    front: useRef(null),
+    back: useRef(null),
+  };
+
+  const imageRefs = {
+    front: useRef(null),
+    back: useRef(null),
+  };
+
+  const { frontText, backText, frontImageUrl, backImageUrl } = cardState;
+  const { isVisible: isPicturePickerVisible, selectedSide } = pickerState;
+
+  const resizeTextarea = useCallback((side) => {
+    const textareaRef = textareaRefs[side];
+    const imageRef = imageRefs[side];
+
     if (textareaRef.current && imageRef.current) {
       const imageHeight = imageRef.current.clientHeight;
       textareaRef.current.style.height = "auto";
@@ -35,37 +50,35 @@ function AddCardComp({
         imageHeight
       )}px`;
     }
-  };
+  }, []);
 
   useEffect(() => {
-    resizeTextarea(frontTextareaRef, frontImageRef);
-    resizeTextarea(backTextareaRef, backImageRef);
-  }, [frontText, backText, frontImageUrl, backImageUrl]);
+    resizeTextarea("front");
+    resizeTextarea("back");
+  }, [frontText, backText, frontImageUrl, backImageUrl, resizeTextarea]);
 
-  const handleImageToggle = (side) => {
-    setSelectedSide((prev) => (prev === side ? null : side));
-    setIsPicturePickerVisible((prev) => selectedSide !== side);
-  };
+  const handleTextChange = useCallback((side, value) => {
+    setCardState((prev) => ({
+      ...prev,
+      [`${side}Text`]: value,
+    }));
+  }, []);
 
-  const handleImageSelect = async (side, imageUrl) => {
-    const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
-    try {
-      await onSave(cardId, field, imageUrl);
-      side === "front" ? setFrontImageUrl(imageUrl) : setBackImageUrl(imageUrl);
-    } catch (error) {
-      console.error("Error saving image:", error);
-    }
-    setIsPicturePickerVisible(false);
-    setSelectedSide(null);
-  };
+  const handleTextSave = useCallback(
+    async (side, text) => {
+      try {
+        const field = side === "front" ? "textForward" : "textBack";
+        await onSave(cardId, field, text);
+      } catch (error) {
+        console.error(`Error saving ${side} text:`, error);
+      }
+    },
+    [cardId, onSave]
+  );
 
-  const handleImageRemove = (side) => {
-    const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
-    onSave(cardId, field, "");
-    side === "front" ? setFrontImageUrl("") : setBackImageUrl("");
-  };
+  const translateText = useCallback(async (text, sourceLang, targetLang) => {
+    if (!text.trim() || !sourceLang || !targetLang) return "";
 
-  const translateText = async (text, sourceLang, targetLang) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
@@ -92,42 +105,128 @@ function AddCardComp({
       console.error("Translation error:", error);
       return "";
     }
-  };
+  }, []);
 
-  const handleFrontTextBlur = async () => {
-    if (
-      !(backText || "").trim() &&
-      (frontText || "").trim() &&
-      targetLanguage &&
-      nativeLanguage
-    ) {
-      const translatedText = await translateText(
-        frontText,
-        nativeLanguage,
-        targetLanguage
-      );
-      setBackText(translatedText);
-      onSave(cardId, "textForward", frontText);
-      onSave(cardId, "textBack", translatedText);
-    }
-  };
+  const handleTextBlur = useCallback(
+    async (side) => {
+      const oppositeTextKey = side === "front" ? "backText" : "frontText";
+      const currentTextKey = `${side}Text`;
+      const currentText = cardState[currentTextKey];
+      const oppositeText = cardState[oppositeTextKey];
 
-  const handleBackTextBlur = async () => {
-    if (
-      !(frontText || "").trim() &&
-      (backText || "").trim() &&
-      targetLanguage &&
-      nativeLanguage
-    ) {
-      const translatedText = await translateText(
-        backText,
-        targetLanguage,
+      await handleTextSave(side, currentText);
+
+      if (
+        !oppositeText.trim() &&
+        currentText.trim() &&
+        targetLanguage &&
         nativeLanguage
-      );
-      setFrontText(translatedText);
-      onSave(cardId, "textForward", translatedText);
-      onSave(cardId, "textBack", backText);
-    }
+      ) {
+        const sourceLang = side === "front" ? nativeLanguage : targetLanguage;
+        const targetLang = side === "front" ? targetLanguage : nativeLanguage;
+
+        const translatedText = await translateText(
+          currentText,
+          sourceLang,
+          targetLang
+        );
+
+        if (translatedText) {
+          setCardState((prev) => ({
+            ...prev,
+            [oppositeTextKey]: translatedText,
+          }));
+
+          await handleTextSave(
+            side === "front" ? "back" : "front",
+            translatedText
+          );
+        }
+      }
+    },
+    [cardState, handleTextSave, nativeLanguage, targetLanguage, translateText]
+  );
+
+  const handleImageToggle = useCallback((side) => {
+    setPickerState((prev) => ({
+      selectedSide: prev.selectedSide === side ? null : side,
+      isVisible: prev.selectedSide !== side,
+    }));
+  }, []);
+
+  const handleImageSelect = useCallback(
+    async (side, imageUrl) => {
+      const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
+      try {
+        await onSave(cardId, field, imageUrl);
+        setCardState((prev) => ({
+          ...prev,
+          [`${side}ImageUrl`]: imageUrl,
+        }));
+      } catch (error) {
+        console.error("Error saving image:", error);
+      }
+
+      setPickerState({
+        isVisible: false,
+        selectedSide: null,
+      });
+    },
+    [cardId, onSave]
+  );
+
+  const handleImageRemove = useCallback(
+    async (side) => {
+      const field = side === "front" ? "imageUrlForward" : "imageUrlBack";
+      try {
+        await onSave(cardId, field, "");
+        setCardState((prev) => ({
+          ...prev,
+          [`${side}ImageUrl`]: "",
+        }));
+      } catch (error) {
+        console.error("Error removing image:", error);
+      }
+    },
+    [cardId, onSave]
+  );
+
+  const renderCardSide = (side) => {
+    const isfront = side === "front";
+    const text = isfront ? frontText : backText;
+    const imageUrl = isfront ? frontImageUrl : backImageUrl;
+
+    return (
+      <div className="flex flex-row items-center gap-8 flex-1">
+        <textarea
+          placeholder={`Type your text here! (${
+            isfront ? "Front" : "Back"
+          } side)`}
+          className="textarea w-full resize-none p-2"
+          ref={textareaRefs[side]}
+          value={text}
+          onChange={(e) => handleTextChange(side, e.target.value)}
+          onBlur={() => handleTextBlur(side)}
+          style={{ minHeight: "40px", fontSize: "16px" }}
+        />
+        <div
+          ref={imageRefs[side]}
+          style={{
+            backgroundImage: imageUrl ? `url(${imageUrl})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
+            selectedSide === side ? "ring ring-primary" : ""
+          }`}
+          onClick={() => {
+            imageUrl ? handleImageRemove(side) : handleImageToggle(side);
+          }}
+        >
+          {!imageUrl && <span className="text-gray-500 font-bold">IMAGE</span>}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -142,71 +241,11 @@ function AddCardComp({
           &times;
         </button>
 
-        <div className="flex flex-row items-center gap-8 flex-1">
-          <textarea
-            placeholder="Type your text here! (Front side)"
-            className="textarea w-full resize-none p-2"
-            ref={frontTextareaRef}
-            value={frontText}
-            onChange={(e) => setFrontText(e.target.value)}
-            onBlur={handleFrontTextBlur}
-            style={{ minHeight: "40px", fontSize: "16px" }}
-          />
-          <div
-            ref={frontImageRef}
-            style={{
-              backgroundImage: `url(${frontImageUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
-              selectedSide === "front" ? "ring ring-primary" : ""
-            }`}
-            onClick={() => {
-              frontImageUrl
-                ? handleImageRemove("front")
-                : handleImageToggle("front");
-            }}
-          >
-            {!frontImageUrl && (
-              <span className="text-gray-500 font-bold">IMAGE</span>
-            )}
-          </div>
-        </div>
+        {renderCardSide("front")}
 
         <div className="divider divider-horizontal"></div>
 
-        <div className="flex flex-row items-center gap-8 flex-1">
-          <textarea
-            placeholder="Type your text here! (Back side)"
-            className="textarea w-full resize-none p-2"
-            ref={backTextareaRef}
-            value={backText}
-            onChange={(e) => setBackText(e.target.value)}
-            onBlur={handleBackTextBlur}
-            style={{ minHeight: "40px", fontSize: "16px" }}
-          />
-          <div
-            ref={backImageRef}
-            style={{
-              backgroundImage: `url(${backImageUrl})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-            className={`relative w-32 sm:w-24 sm:h-24 md:w-28 lg:w-32 border rounded cursor-pointer flex items-center justify-center ${
-              selectedSide === "back" ? "ring ring-primary" : ""
-            }`}
-            onClick={() => {
-              backImageUrl
-                ? handleImageRemove("back")
-                : handleImageToggle("back");
-            }}
-          >
-            {!backImageUrl && (
-              <span className="text-gray-500 font-bold">IMAGE</span>
-            )}
-          </div>
-        </div>
+        {renderCardSide("back")}
       </div>
 
       {isPicturePickerVisible && (
