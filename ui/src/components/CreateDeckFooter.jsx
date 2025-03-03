@@ -40,7 +40,6 @@ function CreateDeckFooter({
           (card.textBack || "").trim() !== ""
       );
     setIsSaveEnabled(allCardsFilled);
-    console.log("Save button enabled:", allCardsFilled, "Cards:", cards);
   }, [cards]);
 
   useEffect(() => {

@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
+import useWindowSize from "react-use/lib/useWindowSize";
+import Confetti from "react-confetti";
+
 import Sidebar from "./Sidebar";
 import Card from "./Card";
 import CardRateBtns from "./CardRateBtns";
@@ -17,6 +20,8 @@ function Home({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { width, height } = useWindowSize();
+  const [deckCompleted, setDeckCompleted] = useState(false);
   const { deckId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,6 +70,7 @@ function Home({
           const data = await response.json();
           setCurrentDeck(decks.find((deck) => deck.id === deckId));
           setCards(data.cards || []);
+          setDeckCompleted(false);
           setCurrentIndex(0);
         }
       } catch (error) {
@@ -113,7 +119,9 @@ function Home({
         }
       );
 
-      if (currentIndex < cards.length - 1) {
+      if (currentIndex === cards.length - 1) {
+        setDeckCompleted(true);
+      } else {
         setCurrentIndex((prev) => prev + 1);
         handleShowAnswerBtnClick(false);
       }
@@ -136,6 +144,10 @@ function Home({
 
   return (
     <div className="flex pl-12 gap-18 mt-24">
+      {deckCompleted && (
+        <Confetti width={width} height={height} recycle={false} />
+      )}
+
       <Sidebar
         decks={filteredDecks}
         selectedDeck={selectedDeck}
@@ -144,9 +156,22 @@ function Home({
         onDeckClick={handleDeckClick}
       />
 
-      <div className="flex flex-col pr-32">
+      <div className="flex flex-col pr-32 justify-center items-center w-full">
+        {" "}
         {isLoading ? (
           <div className="skeleton h-[500px] w-full bg-base-200 animate-pulse rounded-box"></div>
+        ) : deckCompleted ? (
+          <div className="text-center animate-fade-in">
+            <div className="text-9xl mb-8">🎉</div>
+            <h2 className="text-4xl font-bold mb-4">Deck Mastered!</h2>
+            <p className="text-xl text-gray-600">
+              You've successfully reviewed all cards in{" "}
+              <span className="font-semibold text-primary">
+                {currentDeck?.name}.
+              </span>{" "}
+              Now choose another deck!
+            </p>
+          </div>
         ) : currentCard ? (
           <div key={`card-${currentIndex}`}>
             <Card

@@ -9,7 +9,7 @@ function Card({
   return (
     <div className="card bg-transparent text-neutral-content w-290 p-4">
       <div className="flex w-full flex-col border-opacity-50 ">
-        <div className="card bg-base-100 rounded-box grid h-80 flex flex-row items-center justify-center space-x-4 overflow-scroll gap-4">
+        <div className="card bg-base-100 rounded-box h-80 flex flex-column items-center justify-center overflow-scroll gap-4">
           {imgForward && (
             <img
               src={imgForward}
@@ -23,7 +23,7 @@ function Card({
         <div className="divider"></div>
 
         {showAnswerBtnClicked ? (
-          <div className="card bg-base-100 rounded-box grid h-80 place-items-center flex justify-center overflow-scroll gap-4">
+          <div className="card bg-base-100 rounded-box h-80 place-items-center flex justify-center overflow-scroll gap-4">
             {imgBack && (
               <img
                 src={imgBack}
