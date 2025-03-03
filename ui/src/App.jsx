@@ -19,7 +19,9 @@ function App() {
   };
 
   const resetShowAnswerBtn = () => {
-    setShowAnswerBtnClicked(false);
+    if (showAnswerBtnClicked) {
+      setShowAnswerBtnClicked(false);
+    }
   };
 
   useEffect(() => {
