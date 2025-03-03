@@ -136,15 +136,15 @@ function CreateDeckFooter({
         />
 
         <LanguageSelector
-          label="Native Language"
-          value={targetLanguage}
-          onChange={setTargetLanguage}
+          label="Front-side Language"
+          value={nativeLanguage}
+          onChange={setNativeLanguage}
         />
 
         <LanguageSelector
-          label="Target Language"
-          value={nativeLanguage}
-          onChange={setNativeLanguage}
+          label="Back-side Language"
+          value={targetLanguage}
+          onChange={setTargetLanguage}
         />
       </div>
 
