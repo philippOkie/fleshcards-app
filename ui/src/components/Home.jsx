@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
 import Card from "./Card";
@@ -15,7 +15,11 @@ function Home({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cards, setCards] = useState([]);
   const [decks, setDecks] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDeck, setSelectedDeck] = useState(null);
   const { deckId, cardId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchAllDecks = async () => {
@@ -41,6 +45,13 @@ function Home({
 
     fetchAllDecks();
   }, []);
+
+  useEffect(() => {
+    const match = location.pathname.match(/\/study\/([a-f0-9-]{36})/);
+    if (match) {
+      setSelectedDeck(match[1]);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!deckId || !decks.length) return;
@@ -83,6 +94,25 @@ function Home({
 
   const currentCard = cards[currentIndex];
 
+  const handleDeckClick = (deckId) => {
+    setSelectedDeck(deckId);
+    localStorage.setItem("lastChosenDeck", deckId);
+    navigate(`/study/${deckId}`);
+    resetShowAnswerBtn();
+  };
+
+  const handleSearchTermChange = (term) => {
+    setSearchTerm(term);
+  };
+
+  const filteredDecks = decks
+    .filter((deck) =>
+      deck.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) =>
+      a.id === selectedDeck ? -1 : b.id === selectedDeck ? 1 : 0
+    );
+
   const handleRateCard = async (rating) => {
     try {
       const token = localStorage.getItem("token");
@@ -116,7 +146,13 @@ function Home({
 
   return (
     <div className="flex pl-12 gap-18 mt-24">
-      <Sidebar decks={decks} resetShowAnswerBtn={resetShowAnswerBtn} />
+      <Sidebar
+        decks={filteredDecks}
+        selectedDeck={selectedDeck}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchTermChange}
+        onDeckClick={handleDeckClick}
+      />
       <div className="flex flex-col pr-32">
         {currentCard ? (
           <div key={currentCard.id}>
