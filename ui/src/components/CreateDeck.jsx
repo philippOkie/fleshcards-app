@@ -1,35 +1,32 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDeck } from "./DeckContext";
+
 import AddCardComp from "./AddCardComp";
 import CreateDeckFooter from "./CreateDeckFooter";
 
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { useDeck } from "./DeckContext";
-
 function CreateDeck() {
   const { unfinishedDeck, setUnfinishedDeck } = useDeck();
-  const [deckCards, setDeckCards] = useState([]);
-  const [targetLanguage, setTargetLanguage] = useState(
-    localStorage.getItem("targetLanguage") || ""
-  );
-  const [nativeLanguage, setNativeLanguage] = useState(
-    localStorage.getItem("nativeLanguage") || ""
-  );
-
   const navigate = useNavigate();
   const bottomRef = useRef(null);
   const authToken = localStorage.getItem("token");
 
+  const [deckCards, setDeckCards] = useState([]);
   const [deckTitle, setDeckTitle] = useState(
     () => unfinishedDeck?.name || localStorage.getItem("deckName") || ""
   );
-
   const [deckCategories, setDeckCategories] = useState(() => {
     const storedCategories = localStorage.getItem("deckTopics");
     return storedCategories
       ? JSON.parse(storedCategories)
       : unfinishedDeck?.topics || [];
   });
+  const [targetLanguage, setTargetLanguage] = useState(
+    localStorage.getItem("targetLanguage") || ""
+  );
+  const [nativeLanguage, setNativeLanguage] = useState(
+    localStorage.getItem("nativeLanguage") || ""
+  );
 
   useEffect(() => {
     if (unfinishedDeck?.name) setDeckTitle(unfinishedDeck.name);
@@ -44,35 +41,40 @@ function CreateDeck() {
     localStorage.setItem("deckTopics", JSON.stringify(deckCategories));
   }, [deckCategories]);
 
-  const updateDeckInfo = async (field, value) => {
-    if (!unfinishedDeck?.id) return;
+  useEffect(() => {
+    localStorage.setItem("targetLanguage", targetLanguage);
+  }, [targetLanguage]);
 
-    try {
-      await fetch(
-        `http://localhost:3000/api/decks/update/${unfinishedDeck.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({ [field]: value }),
+  useEffect(() => {
+    localStorage.setItem("nativeLanguage", nativeLanguage);
+  }, [nativeLanguage]);
+
+  const updateDeckInfo = useCallback(
+    async (field, value) => {
+      if (!unfinishedDeck?.id) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/decks/update/${unfinishedDeck.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ [field]: value }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to update deck ${field}`);
         }
-      );
-    } catch (error) {
-      console.error("Error updating deck:", error);
-    }
-  };
-
-  const handleTitleChange = (newTitle) => {
-    setDeckTitle(newTitle);
-    updateDeckInfo("name", newTitle);
-  };
-
-  const handleCategoriesChange = (newCategories) => {
-    setDeckCategories(newCategories);
-    updateDeckInfo("topics", newCategories);
-  };
+      } catch (error) {
+        console.error("Error updating deck:", error);
+      }
+    },
+    [unfinishedDeck?.id, authToken]
+  );
 
   useEffect(() => {
     const loadDeckCards = async () => {
@@ -93,7 +95,7 @@ function CreateDeck() {
         if (!response.ok) throw new Error("Failed to fetch cards");
 
         const data = await response.json();
-        setDeckCards(data.cards);
+        setDeckCards(data.cards || []);
       } catch (error) {
         console.error("Error fetching cards:", error);
       }
@@ -102,7 +104,23 @@ function CreateDeck() {
     loadDeckCards();
   }, [unfinishedDeck?.id, authToken]);
 
-  const addCard = async () => {
+  const handleTitleChange = useCallback(
+    (newTitle) => {
+      setDeckTitle(newTitle);
+      updateDeckInfo("name", newTitle);
+    },
+    [updateDeckInfo]
+  );
+
+  const handleCategoriesChange = useCallback(
+    (newCategories) => {
+      setDeckCategories(newCategories);
+      updateDeckInfo("topics", newCategories);
+    },
+    [updateDeckInfo]
+  );
+
+  const addCard = useCallback(async () => {
     if (!authToken || !unfinishedDeck?.id) {
       console.error("Missing token or deckId");
       return;
@@ -129,39 +147,88 @@ function CreateDeck() {
       const data = await response.json();
       setDeckCards((prevCards) => [...prevCards, data.card]);
 
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 100);
     } catch (error) {
       console.error("Error adding card:", error);
     }
-  };
+  }, [authToken, unfinishedDeck?.id]);
 
-  const deleteCard = async (cardId) => {
-    if (!authToken || !unfinishedDeck?.id) return;
+  const deleteCard = useCallback(
+    async (cardId) => {
+      if (!authToken || !unfinishedDeck?.id) return;
 
-    try {
-      const response = await fetch("http://localhost:3000/api/cards/delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          deckId: unfinishedDeck.id,
-          cardId: cardId,
-        }),
-      });
+      try {
+        const response = await fetch("http://localhost:3000/api/cards/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            deckId: unfinishedDeck.id,
+            cardId: cardId,
+          }),
+        });
 
-      if (!response.ok) throw new Error("Failed to delete card");
+        if (!response.ok) throw new Error("Failed to delete card");
 
-      setDeckCards((prevCards) =>
-        prevCards.filter((card) => card.id !== cardId)
-      );
-    } catch (error) {
-      console.error("Error deleting card:", error);
-    }
-  };
+        setDeckCards((prevCards) =>
+          prevCards.filter((card) => card.id !== cardId)
+        );
+      } catch (error) {
+        console.error("Error deleting card:", error);
+      }
+    },
+    [authToken, unfinishedDeck?.id]
+  );
 
-  const finishDeck = async () => {
+  const handleSaveCardText = useCallback(
+    async (cardId, field, value) => {
+      const numericCardId = Number(cardId);
+      if (isNaN(numericCardId)) {
+        throw new Error("Invalid card ID");
+      }
+
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/cards/update/${numericCardId}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+              deckId: unfinishedDeck?.id,
+              [field]: value,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        const updatedCard = await response.json();
+
+        setDeckCards((prevCards) =>
+          prevCards.map((card) =>
+            card.id === numericCardId ? { ...card, [field]: value } : card
+          )
+        );
+
+        return updatedCard;
+      } catch (error) {
+        console.error("Error updating card:", error);
+        throw error;
+      }
+    },
+    [authToken, unfinishedDeck?.id]
+  );
+
+  const finishDeck = useCallback(async () => {
     if (!unfinishedDeck?.id) return;
 
     try {
@@ -185,49 +252,7 @@ function CreateDeck() {
     } catch (error) {
       console.error("Error marking deck as finished:", error);
     }
-  };
-
-  const handleSaveCardText = async (cardId, field, value) => {
-    const numericCardId = Number(cardId);
-    if (isNaN(numericCardId)) {
-      throw new Error("Invalid card ID");
-    }
-
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/cards/update/${numericCardId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            deckId: unfinishedDeck.id,
-            [field]: value,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-
-      const updatedCard = await response.json();
-
-      setDeckCards((prevCards) =>
-        prevCards.map((card) =>
-          card.id === numericCardId ? { ...card, [field]: value } : card
-        )
-      );
-
-      return updatedCard;
-    } catch (error) {
-      console.error("Error updating card:", error);
-      throw error;
-    }
-  };
-  const deckId = unfinishedDeck?.id;
+  }, [unfinishedDeck?.id, authToken, setUnfinishedDeck, navigate]);
 
   return (
     <div className="flex flex-col mt-24">
@@ -237,7 +262,7 @@ function CreateDeck() {
             <AddCardComp
               key={card.id}
               cardId={card.id}
-              deckId={deckId}
+              deckId={unfinishedDeck?.id}
               initialFrontText={card.textForward}
               initialBackText={card.textBack}
               onDelete={() => deleteCard(card.id)}
