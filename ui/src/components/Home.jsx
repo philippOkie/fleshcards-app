@@ -77,6 +77,16 @@ function Home({
     fetchDeckCards();
   }, [deckId, decks, resetShowAnswerBtn]);
 
+  useEffect(() => {
+    const lastChosenDeck = localStorage.getItem("lastChosenDeck");
+
+    if (lastChosenDeck) {
+      setIsLoading(true);
+      setSelectedDeck(localStorage.getItem("lastChosenDeck"));
+      navigate(`/study/${lastChosenDeck}`);
+    }
+  }, []);
+
   const handleDeckClick = (deckId) => {
     if (deckId === localStorage.getItem("lastChosenDeck")) return;
 
@@ -143,6 +153,8 @@ function Home({
               showAnswerBtnClicked={showAnswerBtnClicked}
               forwardText={currentCard.textForward}
               backText={currentCard.textBack}
+              imgBack={currentCard.imageUrlBack}
+              imgForward={currentCard.imageUrlForward}
             />
 
             <div className="flex justify-center mt-10">
@@ -156,15 +168,13 @@ function Home({
             </div>
           </div>
         ) : (
-          <div className="card bg-neutral text-neutral-content w-290 p-4">
+          <div className="card bg-transparent text-neutral-content w-290 p-4">
             <div className="flex w-full flex-col border-opacity-50">
               <div className="card bg-base-100 rounded-box grid h-80 place-items-center text-5xl">
-                Hello!
+                Please, choose a deck to start!
               </div>
               <div className="divider"></div>
-              <div className="card rounded-box grid h-80 place-items-center text-5xl">
-                <span>Please, choose a deck to start!</span>
-              </div>
+              <div className="card rounded-box grid h-80 place-items-center text-5xl"></div>
             </div>
           </div>
         )}
