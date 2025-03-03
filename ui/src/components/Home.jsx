@@ -112,7 +112,10 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
 
   return (
     <div className="flex pl-12 gap-18 mt-24">
-      <Sidebar decks={decks} />
+      <Sidebar
+        decks={decks}
+        handleShowAnswerBtnClick={handleShowAnswerBtnClick}
+      />
       <div className="flex flex-col pr-32">
         {currentCard ? (
           <div key={currentCard.id}>
