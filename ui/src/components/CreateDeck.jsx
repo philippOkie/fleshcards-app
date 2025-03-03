@@ -193,26 +193,39 @@ function CreateDeck() {
       throw new Error("Invalid card ID");
     }
 
-    const response = await fetch(
-      `http://localhost:3000/api/cards/update/${numericCardId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({
-          deckId: unfinishedDeck.id,
-          [field]: value,
-        }),
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/cards/update/${numericCardId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            deckId: unfinishedDeck.id,
+            [field]: value,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(await response.text());
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(await response.text());
+      const updatedCard = await response.json();
+
+      setDeckCards((prevCards) =>
+        prevCards.map((card) =>
+          card.id === numericCardId ? { ...card, [field]: value } : card
+        )
+      );
+
+      return updatedCard;
+    } catch (error) {
+      console.error("Error updating card:", error);
+      throw error;
     }
-
-    return response.json();
   };
   const deckId = unfinishedDeck?.id;
 

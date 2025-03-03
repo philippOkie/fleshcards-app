@@ -30,12 +30,17 @@ function CreateDeckFooter({
   }, [unfinishedDeck]);
 
   useEffect(() => {
-    const allCardsFilled = cards.every(
-      (card) =>
-        (card.textForward || "").trim() !== "" &&
-        (card.textBack || "").trim() !== ""
-    );
-    setIsSaveEnabled(cards.length > 0 && allCardsFilled);
+    const allCardsFilled =
+      cards &&
+      cards.length > 0 &&
+      cards.every(
+        (card) =>
+          card &&
+          (card.textForward || "").trim() !== "" &&
+          (card.textBack || "").trim() !== ""
+      );
+    setIsSaveEnabled(allCardsFilled);
+    console.log("Save button enabled:", allCardsFilled, "Cards:", cards);
   }, [cards]);
 
   useEffect(() => {
