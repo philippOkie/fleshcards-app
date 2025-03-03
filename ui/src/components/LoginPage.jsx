@@ -56,8 +56,15 @@ function LoginPage({ onLogin }) {
         onLogin();
         navigate("/");
       } else {
-        const errorText = await response.text();
-        setError(errorText || "Invalid credentials. Please try again.");
+        let errorMessage = "Invalid credentials. Please try again.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (jsonError) {
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        }
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Connection error. Please check your internet connection.");
@@ -133,13 +140,18 @@ function LoginPage({ onLogin }) {
             </div>
             <div className="form-control mt-6">
               <button
-                className={`btn btn-primary w-full ${
-                  isLoading ? "loading" : ""
-                }`}
+                className="btn btn-primary w-full"
                 onClick={handleLoginBtnClick}
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm mr-2"></span>
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </button>
             </div>
             <div className="card-body">
