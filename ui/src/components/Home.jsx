@@ -6,7 +6,11 @@ import Card from "./Card";
 import CardRateBtns from "./CardRateBtns";
 import ShowAnswerBtn from "./ShowAnswerBtn";
 
-function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
+function Home({
+  showAnswerBtnClicked,
+  handleShowAnswerBtnClick,
+  resetShowAnswerBtn,
+}) {
   const [currentDeck, setCurrentDeck] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cards, setCards] = useState([]);
@@ -112,10 +116,7 @@ function Home({ showAnswerBtnClicked, handleShowAnswerBtnClick }) {
 
   return (
     <div className="flex pl-12 gap-18 mt-24">
-      <Sidebar
-        decks={decks}
-        handleShowAnswerBtnClick={handleShowAnswerBtnClick}
-      />
+      <Sidebar decks={decks} resetShowAnswerBtn={resetShowAnswerBtn} />
       <div className="flex flex-col pr-32">
         {currentCard ? (
           <div key={currentCard.id}>

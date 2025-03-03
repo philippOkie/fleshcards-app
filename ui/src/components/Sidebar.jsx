@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function Sidebar({ decks = [], handleShowAnswerBtnClick }) {
+function Sidebar({ decks = [], resetShowAnswerBtn }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDeck, setSelectedDeck] = useState(null);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ function Sidebar({ decks = [], handleShowAnswerBtnClick }) {
     setSelectedDeck(deckId);
     localStorage.setItem("lastChosenDeck", deckId);
     navigate(`/study/${deckId}`);
-    handleShowAnswerBtnClick(false);
+    resetShowAnswerBtn();
   };
 
   const filteredDecks = decks

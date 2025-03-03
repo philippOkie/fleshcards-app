@@ -18,6 +18,10 @@ function App() {
     setShowAnswerBtnClicked((prev) => !prev);
   };
 
+  const resetShowAnswerBtn = () => {
+    setShowAnswerBtnClicked(false);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsAuthenticated(!!token);
@@ -57,6 +61,7 @@ function App() {
                   <Home
                     showAnswerBtnClicked={showAnswerBtnClicked}
                     handleShowAnswerBtnClick={handleShowAnswerBtnClick}
+                    resetShowAnswerBtn={resetShowAnswerBtn}
                   />
                 </ProtectedRoute>
               }
