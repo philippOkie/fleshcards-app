@@ -86,8 +86,6 @@ function Header({ onLogout }) {
       <div className="navbar-start flex gap-2 items-center mb-2 mt-2 pl-10">
         <div className="text-4xl w-[120px]">Spacer</div>
 
-        <button className="btn btn-neutral w-32 !text-xl">Decks</button>
-
         <button
           className="btn btn-accent w-16 !text-2xl cursor-pointer"
           onClick={handleCreateOrNavigateDeck}
