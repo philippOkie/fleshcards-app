@@ -165,7 +165,7 @@ function Home({
             <div className="text-9xl mb-8">🎉</div>
             <h2 className="text-4xl font-bold mb-4">Deck Mastered!</h2>
             <p className="text-xl text-gray-600">
-              You've successfully reviewed all cards in{" "}
+              You&quot;ve successfully reviewed all cards in{" "}
               <span className="font-semibold text-primary">
                 {currentDeck?.name}.
               </span>{" "}
