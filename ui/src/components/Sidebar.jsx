@@ -23,7 +23,7 @@ function Sidebar({
           decks.map((deck) => (
             <button
               key={deck.id}
-              className={`btn w-full ${
+              className={`btn w-64 ${
                 deck.id === selectedDeck ? "btn-primary" : "btn-neutral"
               }`}
               onClick={() => onDeckClick(deck.id)}
@@ -34,7 +34,7 @@ function Sidebar({
             </button>
           ))
         ) : (
-          <p className="text-center">No decks are due for review.</p>
+          <p className="text-center w-64">No decks are due for review.</p>
         )}
       </div>
     </div>
