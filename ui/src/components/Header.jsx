@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDeck } from "./DeckContext";
+import { useDeck } from "../hooks/useDeck";
 import Avatar from "./Avatar";
 
 function Header({ onLogout }) {

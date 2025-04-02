@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDeck } from "./DeckContext";
+import { useDeck } from "../hooks/useDeck";
 
 import AddCardComp from "./AddCardComp";
 import CreateDeckFooter from "./CreateDeckFooter";

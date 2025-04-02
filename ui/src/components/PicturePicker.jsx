@@ -6,8 +6,6 @@ function PicturePicker({ side, query, onSelectImage }) {
   const [error, setError] = useState(null);
   const cacheRef = useRef({});
 
-  const authToken = localStorage.getItem("token");
-
   useEffect(() => {
     if (!query || query.trim() === "") {
       setPictures([]);
@@ -21,22 +19,28 @@ function PicturePicker({ side, query, onSelectImage }) {
 
     async function fetchPictures() {
       setIsLoading(true);
+      setError(null);
 
       try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          throw new Error("Authentication token not found");
+        }
+
         const response = await fetch(
-          `http://localhost:3000/api/service/pictures?query=${encodeURIComponent(
+          `http://localhost:3000/api/pictures/search?query=${encodeURIComponent(
             query
-          )}&page=1&per_page=7`,
+          )}`,
           {
             headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch pictures");
+          throw new Error(`Failed to fetch pictures: ${response.status}`);
         }
 
         const { results } = await response.json();
@@ -44,7 +48,8 @@ function PicturePicker({ side, query, onSelectImage }) {
         cacheRef.current[query] = results;
         setPictures(results);
       } catch (error) {
-        setError(error.message);
+        setError(error.message || "An error occurred while fetching pictures");
+        console.error("Picture search error:", error);
       } finally {
         setIsLoading(false);
       }
@@ -53,25 +58,29 @@ function PicturePicker({ side, query, onSelectImage }) {
     fetchPictures();
   }, [query]);
 
-  if (isLoading) return <div>Loading pictures...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (isLoading)
+    return <div className="p-4 text-center">Loading pictures...</div>;
+  if (error)
+    return <div className="p-4 text-center text-error">Error: {error}</div>;
   if (!query || query.trim() === "")
-    return <div>Enter text to search for pictures.</div>;
+    return (
+      <div className="p-4 text-center">Enter text to search for pictures.</div>
+    );
 
   return (
     <div className="relative rounded-2xl bg-neutral text-neutral-content w-full p-4 pl-12 pr-12 flex flex-row items-center gap-8 overflow-x-auto">
       {pictures.map((pic) => (
         <div
           key={pic.id}
-          className="avatar cursor-pointer"
+          className="avatar cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => onSelectImage(side, pic.urls)}
         >
           <div className="w-32 rounded">
-            <img src={pic.urls} alt={pic.alt_description} />
+            <img src={pic.urls} alt={pic.alt_description || "Picture"} />
           </div>
         </div>
       ))}
-      <div className="w-32 h-32 rounded-full cursor-pointer flex items-center justify-center text-4xl font-bold text-gray-600">
+      <div className="w-32 h-32 rounded-full cursor-pointer flex items-center justify-center text-4xl font-bold text-gray-600 hover:bg-base-300 transition-colors">
         +
       </div>
     </div>

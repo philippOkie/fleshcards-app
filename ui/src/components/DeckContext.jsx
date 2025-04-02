@@ -1,10 +1,6 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 
-const DeckContext = createContext();
-
-export const useDeck = () => {
-  return useContext(DeckContext);
-};
+export const DeckContext = createContext(null);
 
 export const DeckProvider = ({ children }) => {
   const [unfinishedDeck, setUnfinishedDeck] = useState(null);

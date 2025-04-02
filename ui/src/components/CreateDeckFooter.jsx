@@ -21,13 +21,15 @@ function CreateDeckFooter({
   const [currentDeckTopics, setCurrentDeckTopics] = useState(deckTopics);
 
   useEffect(() => {
-    if (unfinishedDeck?.targetLanguage) {
+    if (!unfinishedDeck) return;
+
+    if (unfinishedDeck.targetLanguage) {
       setTargetLanguage(unfinishedDeck.targetLanguage);
     }
-    if (unfinishedDeck?.nativeLanguage) {
+    if (unfinishedDeck.nativeLanguage) {
       setNativeLanguage(unfinishedDeck.nativeLanguage);
     }
-  }, [unfinishedDeck]);
+  }, [unfinishedDeck, setTargetLanguage, setNativeLanguage]);
 
   useEffect(() => {
     const allCardsFilled =
@@ -43,21 +45,29 @@ function CreateDeckFooter({
   }, [cards]);
 
   useEffect(() => {
-    if (unfinishedDeck?.name) {
+    if (!unfinishedDeck) return;
+
+    if (unfinishedDeck.name) {
       setDeckName(unfinishedDeck.name);
       setCurrentDeckName(unfinishedDeck.name);
     }
-    if (unfinishedDeck?.topics) {
+    if (unfinishedDeck.topics) {
       setDeckTopics(unfinishedDeck.topics);
       setCurrentDeckTopics(unfinishedDeck.topics);
     }
-    if (unfinishedDeck?.targetLanguage) {
+    if (unfinishedDeck.targetLanguage) {
       setTargetLanguage(unfinishedDeck.targetLanguage);
     }
-    if (unfinishedDeck?.nativeLanguage) {
+    if (unfinishedDeck.nativeLanguage) {
       setNativeLanguage(unfinishedDeck.nativeLanguage);
     }
-  }, [unfinishedDeck]);
+  }, [
+    unfinishedDeck,
+    setDeckName,
+    setDeckTopics,
+    setTargetLanguage,
+    setNativeLanguage,
+  ]);
 
   useEffect(() => {
     localStorage.setItem("deckName", deckName);
@@ -77,6 +87,7 @@ function CreateDeckFooter({
 
   const updateDeck = async (field, value) => {
     if (!unfinishedDeck?.id) return;
+
     try {
       await fetch(
         `http://localhost:3000/api/decks/update/${unfinishedDeck.id}`,

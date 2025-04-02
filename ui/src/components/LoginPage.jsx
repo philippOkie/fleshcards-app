@@ -60,13 +60,13 @@ function LoginPage({ onLogin }) {
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
-        } catch (jsonError) {
+        } catch {
           const errorText = await response.text();
           errorMessage = errorText || errorMessage;
         }
         setError(errorMessage);
       }
-    } catch (error) {
+    } catch {
       setError("Connection error. Please check your internet connection.");
     } finally {
       setIsLoading(false);
@@ -127,7 +127,7 @@ function LoginPage({ onLogin }) {
             <div className="form-control mt-4">
               <label className="label mb-2">
                 <span className="label-text">Password</span>
-                <a>(Friendly advice: don't use your old passwords)</a>
+                <a>(Friendly advice: don&apos;t use your old passwords)</a>
               </label>
               <input
                 type="password"
@@ -200,7 +200,9 @@ function LoginPage({ onLogin }) {
                 </button>
               </div>
               <div className="text-center mt-4">
-                <p className="text-base-content/70">Don't have an account?</p>
+                <p className="text-base-content/70">
+                  Don&apos;t have an account?
+                </p>
                 <a className="link link-primary" href="/register">
                   Create an account
                 </a>

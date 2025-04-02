@@ -38,19 +38,22 @@ function AddCardComp({
   const { frontText, backText, frontImageUrl, backImageUrl } = cardState;
   const { isVisible: isPicturePickerVisible, selectedSide } = pickerState;
 
-  const resizeTextarea = useCallback((side) => {
-    const textareaRef = textareaRefs[side];
-    const imageRef = imageRefs[side];
+  const resizeTextarea = useCallback(
+    (side) => {
+      const textareaRef = textareaRefs[side];
+      const imageRef = imageRefs[side];
 
-    if (textareaRef.current && imageRef.current) {
-      const imageHeight = imageRef.current.clientHeight;
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.max(
-        textareaRef.current.scrollHeight,
-        imageHeight
-      )}px`;
-    }
-  }, []);
+      if (textareaRef.current && imageRef.current) {
+        const imageHeight = imageRef.current.clientHeight;
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = `${Math.max(
+          textareaRef.current.scrollHeight,
+          imageHeight
+        )}px`;
+      }
+    },
+    [imageRefs, textareaRefs]
+  );
 
   useEffect(() => {
     resizeTextarea("front");

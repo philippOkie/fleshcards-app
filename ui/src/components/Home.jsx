@@ -83,6 +83,7 @@ function Home({
     fetchDeckCards();
   }, [deckId, decks, resetShowAnswerBtn]);
 
+  // Load and navigate to the last chosen deck
   useEffect(() => {
     const lastChosenDeck = localStorage.getItem("lastChosenDeck");
 
@@ -91,7 +92,7 @@ function Home({
       setSelectedDeck(localStorage.getItem("lastChosenDeck"));
       navigate(`/study/${lastChosenDeck}`);
     }
-  }, []);
+  }, [navigate]);
 
   const handleDeckClick = (deckId) => {
     if (deckId === localStorage.getItem("lastChosenDeck")) return;
