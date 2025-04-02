@@ -2,7 +2,6 @@ function Card({
   showAnswerBtnClicked,
   forwardText,
   backText,
-  imageUrl,
   imgForward,
   imgBack,
 }) {
